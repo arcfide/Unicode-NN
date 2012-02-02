@@ -1,0 +1,89 @@
+This is a list of the status of NN on various machines and systems.
+Last updated 1 April 2005.  This is not necessarrily complete.
+Additions or corrections are welcome!
+
+------------------------------------------------------------------
+Systems:
+	s-386bsd.h	For 386BSD
+	s-3b1g.h	For 3b1 (unix-pc) with GCC
+	s-NeXT1-0.h	For NeXT 1.0
+	s-NeXT2-2.h	For NeXT 2.2
+	s-NeXT3.h	For NeXT 3.x
+	s-aix221.h	For AIX 2.2.1
+	s-aix32.h	For RS6000 AIX 3.2.x (also for AIX 4.1)
+	s-apollo.h	For Apollo Domain/OS systems running BSD 4.3
+	s-aux1-1.h	For A/UX 1.1
+	s-aux3-0.h	For A/UX 3.0.x
+	s-bsd4-2.h	For 4.2 BSD systems
+	s-bsd4-3.h	For 4.3 BSD systems
+	s-dnix5-2.h	For dnix 5.2 on DIAB DS90.
+	s-dnix5-3.h	For dnix 5.3 on DIAB DS90.
+	s-dynix3-0.h	For Dynix 3.0 on Symmetry.
+	s-fortune.h	For Fortune 32:16 [read comments in the file]
+	s-freebsd.h	For FreeBSD 2.x, 3.x, 4.x, 5.x
+	s-hpux.h	For HP-UX (series 300)
+	s-hpux2-1.h	For HP-UX 2.1 (on HP9000 Series 800)
+	s-hpux3-0.h	For HP-UX 3.0 (on HP9000 Series 800)
+	s-hpux6-5.h	For HP-UX 6.5 or newer (series 300)
+	s-hpux7-0.h	For HP-UX 7.0
+	s-hpux8-0.h	For HP-UX 8.0
+	s-hpux9-0.h	For HP-UX 9.0
+	s-hpux9gcc.h	For HP-UX 9.0 with GCC
+	s-ix386.h	For ISC 386/ix 2.0.x (also Dell UNIX 1.x)
+	s-linux.h	For Linux kernel 2.x
+	s-macosx.h	For MacOSX
+	s-netbsd.h	For NetBSD
+	s-osf1.h	For OSF/1 aka DECUnix aka Tru64
+	s-ptx1-1.h	For Dynix/PTX on symmetry
+	s-pyramid.h	For Pyramid (and Nixdorf Targon 35)
+	s-scoV386.h	For SCO UNIX System V/386
+	s-sgi4D.h	For IRIX 3.1/3.2 [read comments in the file]
+	s-sinix.h	For Siemens SINIX system on MX300
+	s-sunos3.h	For SunOS 3.x
+	s-sunos4-0.h	For SunOS 4.0
+	s-sunos4-v.h	For SunOS 4.1 SysV environment
+	s-sunos5.h	For SunOS 5.x
+	s-sys5-4.h	For generic SVR4
+	s-sys5-tcap.h	For System V using termcap rather than terminfo
+	s-sys5.h	For generic System V Release 2 & 3
+	s-sysV88.h	For Motorola System V/88 Release 3
+	s-texas1500.h	For Texas Instruments System 1500
+	s-tower32.h	For NCR Tower-32
+	s-ultrix.h	For ULTRIX systems (BSD 4.2 based)
+	s-umipsb.h	For Mips Risc/os 4.0 or later
+	s-uport2-2.h	For Microport UNIX V.2
+	s-uts2-0.h	For Amdahl UTS 2.0
+	s-xenix286.h	For SCO Xenix Sys V Release 2.2.1 -- terminfo
+	s-xenix286b.h	For SCO XENIX 286 -- termcap
+	s-xenix386.h	For SCO XENIX/386 [termcap version]
+	s-xenix386ds.h	For XENIX386 release 2.3.2 development system
+	s-xenix386wg.h	For SCO XENIX/386 [termcap version]
+	s-xenix68k.h	For Tandy 68000/Xenix Version 3.2
+
+--------------------------------------------------------------------
+Machines:
+	m-3b1g.h	For 3b1 (unix-pc) with GCC
+	m-alpha.h	For DEC alpha based systems
+	m-amdahl.h	For Amdahl 5890 (big iron)
+	m-att3b.h	For AT&T 3b2
+	m-convex.h	For Convex.
+	m-dec3100.h	For DECstation 3100
+	m-gould.h	For Gould PN6000
+	m-hp9000.h	For HP9000 series 320 and 800 (at least)
+	m-i80286.h	For Intel 80286 processors
+	m-i80386.h	For Intel 80386 processors
+	m-m680x0.h	For Motorola 68000 family processors
+	m-m88000.h	For Motorola 88000 risc processors
+	m-mips.h	For MIPS processors
+	m-mx300.h	For Siemens MX300
+	m-pcs.h		For PCS
+	m-powerpc.h	For PowerPC
+	m-pyramid.h	For Pyramid (and Targon 35).
+	m-rs6000.h	For IBM RS6000
+	m-rt6150.h	For IBM/RT 6150
+	m-sgi4D.h	For Silicon Graphics 4D series
+	m-sparc.h	For SPARC processors
+	m-sun386i.h	For 80386 based SUNs
+	m-symmetry.h	For Sequent Symmetry
+	m-vax.h 	For VAX family
+

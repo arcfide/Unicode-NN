@@ -1,0 +1,21 @@
+# !/bin/sh
+# Sun Nov 30 22:34:48 EST 1986	(...!sunybcs!gworek / ...!boulder!forys)
+# Thu Feb 8   gt6152a@prism.gatech.edu
+#             Modefied cn to work with nn (patchlevel 10)
+#             NOTE:  You might want to change the following line below:
+#		     printf "[%3.3s] %-20.20", $2, $1; \
+#                                      ^^^^^
+#                    This is the max length of the new group name that will be
+#                    printed.
+#
+#	cn - Check for available news, multicolumn style.
+#
+	nncheck -Q -t | sort +1 -2 |\
+		awk '{ \
+			printf "[%3.3s] %-20.20s", $1, $2; \
+			if ((NR % 3) == 0) \
+				print ""; \
+		} END { \
+			if ((NR) && (NR % 3)) \
+				print ""; \
+		}'

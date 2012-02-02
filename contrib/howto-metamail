@@ -1,0 +1,43 @@
+From daemon Sun Dec  6 05:31 WST 1992
+Received: from DIALix.UUCP by zeus.dialix.oz.au with UUCP id AA27980
+  (5.65c8/IDA-1.4.4 for peter); Sun, 6 Dec 1992 05:30:33 +0800
+Received: from uniwa.uwa.edu.au by perth.DIALix.oz.au id aa10274;
+          5 Dec 92 23:53 WST
+Received: from horn.kpc.com by uniwa.uwa.edu.au with SMTP (5.65c)
+	id AA28631; Sat, 5 Dec 1992 23:55:36 +0800
+Received: by horn.kpc.com (5.65/fma-120691);
+	id AA22446; Sat, 5 Dec 92 07:55:53 -0800
+Received: from pine by kpc.com (5.65/SMI-4.1-kpc1119)
+	id AA03170; Sat, 5 Dec 92 07:54:50 -0800
+Received: from thorn by mailbox.kpc.com (4.1/kpc-921120)
+	id AA16619; Sat, 5 Dec 92 07:56:01 PST
+Message-Id: <9212051556.AA05130@thorn.kpc.com>
+To: peter@dialix.oz.au
+Cc: nn@uniwa.uwa.edu.au
+Subject: Re: A list of the changes so far to NN-6.4.beta19 
+In-Reply-To: Your message of "Sat, 05 Dec 92 22:36:49 +0800."
+             <9212052236.aa05009@perth.DIALix.oz.au> 
+Date: Sat, 05 Dec 92 07:56:00 -0800
+From: mikew@kpc.com
+Resent-Date:  Sat, 5 Dec 92 15:56:20 GMT
+Resent-From: peter@DIALix.oz.au
+Resent-To: peter@zeus.dialix.oz.au
+X-Charset: ASCII
+X-Char-Esc: 29
+Content-Type: text
+Content-Length: 453
+Status: RO
+
+Simple support for reading MIME message is really easy, just add
+the following to your ./nn/init file.
+	define 1
+	    # Process a message with metamail
+	    save-full "|metamail -m nn -p"
+	end
+	map show Z macro 1
+It would be really cool if nn would automatically do this if the 
+Content-Type header was present. I have some code that at least 
+adds Content-Type as a recognized header. Some more work would be 
+needed to do something useful with this.
+
+

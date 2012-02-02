@@ -1,0 +1,541 @@
+.TH NNMASTER 8 "Release 6.6"
+.\" (c) Copyright 1988, 1990, Kim F. Storm.  All rights reserved.
+.UC 4
+.SH NAME
+nnmaster \- nn database manager
+.SH SYNOPSIS
+\fBnnmaster\fP \-\fBI\fP [\fIlmit\fP]
+.br
+\fBnnmaster\fP \-\fBw\fP
+.br
+\fBnnmaster\fP \-\fBv\fP
+.br
+\fBnnmaster\fP \-\fBl\fP [ "\fIlock message\fP" ]
+.br
+\fBnnmaster\fP [ \fIoptions\fP ] [ \fIgroups\fP ]
+.br.
+\fBnnmaster\fP \-\fBF\fP [ \fIoptions\fP ] [ \fIgroups\fP ]
+.SH DESCRIPTION
+.I nnmaster
+is the daemon which is responsible for building and maintaining the
+database used by the \fInn\fP(1) news reader.
+.LP
+Normally,
+.I nnmaster
+is started when the system enters multi-user mode, and runs until
+system shutdown.  To facilitate this, you should place the following
+call in /etc/rc (or similar) to invoke the
+.I nnmaster
+daemon:
+.sp 0.5v
+	$master/nnmaster -l -r -C
+.sp 0.5v
+where $master is the MASTER_DIRECTORY defined during configuration
+of \fInn\fP.
+.LP
+When
+.I nnmaster
+is started as specified above, it will first unlock the database in
+case it was locked (\-\fBl\fP), perform a thorough consistency check on the
+database (\-\fBC\fP).
+.LP
+Then, every 10 minutes (\-\fBr\fP), it will look at the time-stamp
+of the news active file to see whether new articles have arrived on
+the system (or whether articles have been expired). (See \-\fBU\fP)
+.LP
+If the active file has been modified,
+.I nnmaster
+will collect the header information from the new articles and enter
+them into the database (or remove the headers of the expired articles
+from the database).
+.LP
+If it detects that some articles have been expired, it will
+automatically remove the header information of the expired articles
+from the database.
+.SH ARTICLE COLLECTION OPTIONS
+Normally, \fInnmaster\fP will collect all available news groups
+defined in the news active file.  The set of collected groups can be
+controlled via the argument line.  Groups can be either included or
+excluded:
+.sp 0.5v
+A group name, e.g. comp, will cause the group and all its subgroups to
+be collected.  Individual groups, e.g. news.software.nn, can also be
+specified
+.sp 0.5v
+A group name preceded by an exclamation mark, e.g. !talk.politics,
+will cause the group and all its subgroups to be ignored.
+.sp 0.5v
+An empty argument, i.e. "", will cause all groups that are not ignored
+to be collected.  For example, to collect everything but rec and misc,
+use the following command:
+.br
+	\fInnmaster\fP -r !rec !misc ""
+.br
+If the empty argument had been omitted, nothing would be collected,
+since the presence of any \fIgroups\fP arguments causes \fInnmaster\fP
+to ignore all groups which are not explicitly mentioned.
+.sp 0.5v
+Example 1: The following commands can be executed by cron to collect
+different sets of groups at different intervals or under different
+conditions:
+.br
+	\fInnmaster\fP -B -O14 rec misc sci -LBO -u
+.br
+	\fInnmaster\fP !rec !misc !sci "" -u
+.sp 0.5v
+Example 2: The group arguments are used in the given sequence, e.g. to
+leave out comp.sys, but still collect comp.sys.ibm.pc, use the command:
+.br
+	\fInnmaster\fP -r comp.sys.ibm.pc !comp.sys ""
+.sp 0.5v
+The use of the \-\fBu\fP option in the first example is essential,
+since each of the commands will update the active file time stamp
+which will prevent the other command from detecting new articles that
+have arrived.
+.sp 0.5v
+Using this method to keep specific groups out of the database must be
+used with great caution; just a single invocation of \fInnmaster\fP
+without any arguments will collect all the otherwise ignored groups!
+.SH COLLECTION OF ARTICLES
+The following options control how \fInnmaster\fP performs the
+collection of new articles.
+.TP
+\-\fBr\fP [ \fImin\fP ]
+.br
+Daemon mode.  The \fInnmaster\fP will put itself in the background
+(unless \-\fBf\fP is also specified),
+and will checks for arrival of new articles and expired articles every
+.I min
+minutes (and update the database accordingly).  If
+.I min
+is omitted, the default is to check every 10 minutes.
+.sp 0.5v
+Without the \-r option, the \fInnmaster\fP will just perform a single
+collection of new articles (if any) and then exit.  This can be used
+to have the \fInnmaster\fP started by
+.IR cron (8)
+at regular intervals instead of having it as a daemon which sleeps
+between checking for new articles.  Since the \fInnmaster\fP is a bit
+expensive to start up (it has to read a few files), it is up to you to
+decide which mode is best on your system.  (I have also heard that it
+works to call \fInnmaster\fP without \-r from
+.IR inews (1).
+I cannot recommend this unless you receive batched news; invoking
+\fInnmaster\fP for every received article sounds too expensive to me.)
+.TP
+\-\fBh\fP [ \fIsec\fP ]
+Hold collection of new articles until next scan if new articles have
+arrived withing the last \fIsec\fP [60] seconds.  This is useful to
+prevent \fInnmaster\fP from competing for disk i/o with an \fIrnews\fP
+process which is unbatching incoming news, or a running \fIexpire\fP
+process.  It will have the side effect of limiting the number of C:
+entries in the log, since collection of incoming batches will
+typically be done in larger thunks.
+.TP
+.B \-f
+Run \fInnmaster\fP in foreground in daemon mode (see \-\fBr\fP).
+Useful if \fInnmaster\fP is invoked from inittab.  (Notice that if you
+use a \fIrespawn\fP entry in inittab, you will not be able to stop
+\fInnmaster\fP using the \-\fBk\fP option, since init will immediately
+start another master.)
+.TP
+.B \-C
+Perform a consistency check on the database on start-up, and rebuild
+corrupted database files.  This operation can be quite time-consuming
+since it reads through all the database files.
+.TP
+.B \-b
+Normally, articles without a proper news header (no Newsgroups: line)
+are ignored.  Specifying the \-\fBb\fP option causes these `bad'
+articles to be included in the database (normally with no sender or
+subject).
+.TP
+.B \-B
+Remove `bad' articles.  Sometimes, articles without a header ends up
+in the news spool directory.  These articles have no article id, and
+therefore, they will never be expired by \fBexpire\fP(8).  This option
+will allow the \fInnmaster\fP to silently remove these articles (a `B'
+entry will occur in the log file).
+.TP
+\-\fBO\fP \fIdays\fP
+Ignore articles which are older than the given number of \fIdays\fP.
+This may help keep old 'stray' articles out of the database.  If the
+\-\fBB\fP options is also specified, the old articles will be removed
+from the news spool directories.  Old ignored or removed articles will
+be reported with an `O' entry in the log file.  This option can be
+disable for individual groups by the \fBO\fP flag in the GROUPS file
+(see below).
+.TP
+\-\fBR\fP \fIN\fP
+Specifies how the \fIauto-recollect\fP operation is performed on the
+groups having this option set in the GROUPS file (see below).  Four
+methods are available (default is method 1):
+.br
+\fB1\fP:  Run expire on the group when new articles arrive.
+.br
+\fB2\fP:  Run expire on the group on every scan.
+.br
+\fB3\fP:  Recollect all articles when new articles arrive.
+.br
+\fB4\fP:  Recollect all articles on every scan.
+.br
+.TP
+\-\fBM\fP \fImode\fP
+Normally, \fInnmaster\fP will send a message via mail to the news
+administrator (OWNER) when an error or potential problems
+(primarily nntp related) occur.  This can be restricted to only fatal
+errors (\fInnmaster\fP terminated) if \fImode\fP is 1, and disabled
+completely if \fImode\fP is 0.
+.TP
+\-\fBQ\fP
+Normally, \fInnmaster\fP will print a message on the system console or
+in the syslog if a fatal error happens.  This option will prevent
+this, so only a type 'E' entry is written to the Log file.
+.SH DATABASE EXPIRATION
+Since articles does not stay forever in the news system, the database
+must be cleaned up regularly to remove the information stored for
+expired articles.  Expiration of the database is normally \fBscheduled\fP
+using the \fInnadmin\fP(1M) command executed by cron at a suitable
+time when expire on the news articles has completed.  The following
+command will send a message to the \fInnmaster\fP and cause it to
+initiate expire on all news groups:
+.sp 0.5v
+	nnadmin =EYW
+.LP
+Selective expiration of individual groups can be done from
+\fInnadmin\fP (interactive mode).  It can also be done by invoking
+\fInnmaster\fP with the \-\fBF\fP option.  For example, the following
+command will run expire on all groups except the `rec' groups:
+.sp 0.5v
+	nnmaster \-F \-k !rec ""
+.sp 0.5v
+The \-\fBk\fP option is required to terminate the currently running
+master since two daemons cannot be running at the same time.  Thus to
+run expire (on all groups) in this way from cron, the following
+commands must be used:
+	nnmaster \-Fk "" ; nnmaster \-r ...
+.LP
+It is also possible to have \fInnmaster\fP detect expiration
+automatically (see \-\fBe\fP).  This requires that the \fImin\fP field
+in the active file is updated by
+the news expire (this is not the default case when Cnews is used).
+However, this is not always a safe indication since the first article
+may not have been expired, while a lot of other articles have been
+deleted.
+.LP
+There are several strategies available in the
+\fInnmaster\fP to do this clean-up, each having their strengths and
+weaknesses.
+.LP
+\fBMethod 1\fP (default):  Rebuilds the database from the existing
+database information by comparing the current database contents with
+the contents of the news group directories, eliminating entries whose
+file no longer exists.  This method is guaranteed to eliminate all
+expired articles from the database, and it is reasonably fast because
+it only has to read the directories, not each article file.
+  If news is accessed remotely via nntp, the list of existing articles
+cannot efficiently be fetched by reading a local directory.  Instead
+an XHDR request is sent to the nntp server to get a list of articles.
+.LP
+\fBMethod 2\fP:  Eliminates only the expired articles before the first
+article in the group.  This is very fast since only the active file
+and the database itself is accessed, but it will obviously leave some
+expired articles in the database.  This method requires that the \fImin\fP
+field in the active file is updated by \fIexpire\fP.
+.LP
+\fBMethod 3\fP:  Discard the current database information and
+recollects all articles.  This is obviously very time consuming, and
+it is therefore not recommended, especially not with nntp.
+.LP
+The options related to database expiration are:
+.TP
+\-\fBE\fP \fIN\fP
+Select expire method \fIN\fP.  (If \fIN\fP is omitted, the default
+method is used).
+.TP
+\-\fBe\fP [\fIN\fP]
+Automatically run expire in the database on groups where the \fImin\fP
+number in the active file has increased by \fIN\fP (1 if omitted) articles.
+This is disabled by default (since the \fImin\fP field is often unreliable).
+.TP
+\-\fBF\fP
+Run expire once and exit.  If a list of \fIgroups\fP is specified on
+the command line, the matched groups (see the rules above) will be
+marked for expiration.  If no groups are specified, only the groups
+already scheduled for expire will be expired.  Consequently, to expire
+all groups, a blank argument "" (matching all groups) must be specified.
+.SH DATABASE LOCKING
+The database can be locked centrally, which will normally disallow all
+access to the database, and even block \fInnmaster\fP from being
+(accidentally) started.  When a lock is set on the database, all
+currently running clients will terminate the next time they try to
+access the database.  Setting a lock on the database can thus also be
+used to force running clients to terminate.
+.LP
+The following options set and clear locks on the database:
+.TP
+\-\fBl\fP \fImessage\fP
+Locks the database with the given \fImessage\fP.  The message will be
+displayed every time a program tries to access the database.
+.TP
+.B \-l
+Unlock the database if it was locked.
+.TP
+.B \-i
+Ignore a possible lock and continue.  This can be used to have
+\fInnmaster\fP operate on a database which is blocked from normal user
+access.
+.LP
+Since only one \fInnmaster\fP can operate on the database at any one
+time, a running \fInnmaster\fP daemon must be stopped before a lock
+can be set on the database.  If neither
+.B \-f
+nor
+.B \-r
+is specified with the
+.B \-l
+option (in both forms), \fInnmaster\fP will terminate after setting or
+clearing the lock.
+.SH DATABASE INITIALIZATION
+The following options are used to initialize and update the central
+database files:
+.TP
+\fB\-I\fP [\fIlimit\fP]
+Initialize database.  This option will erase an existing database, and
+create an empty database containing entries for the currently known
+groups.  \fInnmaster\fP will offer you to use an existing GROUPS file
+when initializing the database.
+.sp 0.5v
+The optional \fIlimit\fP can be used to put a limit on the number of
+articles that will be collected in each group during the first
+collection of articles following the database initialization.  This is
+useful on systems where the 'min' field in the active file is
+unreliable or not maintained (Cnews doesn't) to limit the work done to
+do the initial collection of news after the initialization of the
+database.  If news is accessed remotely from an NNTP server, this is
+even more important!  If \fIlimit\fP is omitted, or is zero,
+\fInnmaster\fP will trust the min field and collect all articles in
+the range min..last.
+.TP
+.B \-G
+Reread the GROUPS file.  This option is used to instruct
+\fInnmaster\fP to parse the GROUPS file after it has been edited.
+See the section on the GROUPS file below.
+.SH MISCELLANEOUS OPTIONS
+The following options controls various details of the \fInnmaster\fP's
+behaviour:
+.TP
+\fB\-D\fP [ \fIN\fP ]
+Run \fInnmaster\fP in "debug mode".  If \fIN\fP is omitted, or equals 1 or
+3, this will produce a compact but still very informative trace of the
+collection or expire process directly on the terminal.  This is most
+useful when doing the first collection of articles after initializing
+the database with -I.  If \fIN\fP is 2 or 3, a trace of the NNTP
+traffic is written to a file nnmaster.log in the TMP directory. This
+option disables \-\fBr\fP.
+.TP
+\-\fBH\fP
+Identifies the host which \fInnmaster\fP is running on as the
+nntp-server for its clients, i.e. that it can access the news spool
+directory locally without using NNTP.  Normally, \fInnmaster\fP will
+detect this by itself by comparing the host name to the contents of
+the nntp_server file, so this option should really be superfluous.
+.TP
+\-\fBy\fP \fIretries\fP
+.br
+In some networked environment, opening an article (shared from another
+machine via NFS) may fail for no obvious reason.  Using this option,
+it is possible to cause
+\fInnmaster\fP to perform \fIretries\fP attempts to open an article
+before marking the article as non-existing in the database.
+.TP
+\-\fBL\fP \fItypes\fP
+Exclude the specified entry types from the log file.  This is normally
+used to exclude the 'C'ollecting and e'X'pire entries (\-\fBL\fPCXO).
+.TP
+.B \-t
+Trace the collection process.  This will place a lot of information
+into the log file (T: entries).
+.TP
+.B \-u
+Normally, \fInnmaster\fP will just compare the time-stamp on the
+active file with a time-stamp saved in the database to see if new
+articles have arrived.  The \-u option forces the \fInnmaster\fP to
+.I read
+the active file on start-up to see if new articles have arrived.
+.TP
+.B \-U
+Some SVR4 systems (and maybe SunOS) have a useful "feature".  Writing
+files with mmap() may not update the last-changed timestamp on the file.
+Since INN uses mmap() for writing the active file, this becomes a problem
+for \fInnmaster\fP.
+The \-U option causes \fInnmaster\fP to unconditionally read the active
+file each time the repeat delay (\-r) time expires. 
+.TP
+.B \-v
+Print the release and version identification for \fInnmaster\fP, and exit.
+.TP
+.B \-w
+Wakeup the real \fInnmaster\fP.  Send a signal to the \fInnmaster\fP
+daemon to have it check for new articles immediately.
+.TP
+.B \-k
+Kill the already running \fInnmaster\fP daemon before proceeding with
+the operation specified by the other options (or terminate if no other
+operation is requested).
+.SH THE GROUPS FILE
+The primary purpose of the GROUPS file is to store the names of the
+news groups represented in the database.  Each line in the file
+corresponds to an entry in the (binary) MASTER file, and the sequence
+of the lines in the GROUPS file must never be changed unless the
+database is reinitialized afterwards.
+.LP
+However, the contents of the lines in the GROUPS file can be edited to
+control how the \fInnmaster\fP should handle each individual group.
+.LP
+The format of each line is:
+.sp 0.5v
+	news.group.name [ timestamp ] [ flags ]
+.LP
+The news group name is the name of the group, and must not be changed
+in any way.  If the group is no longer in the news active file, and
+consequently the group does no longer exist, group name can be
+replaced by a `@' character which will instruct \fInnmaster\fP to
+ignore this entry without having to rebuild the entire database.
+.LP
+The optional time stamp indicates when the line was added to the
+GROUPS file and is used by \fInn\fP to detect new groups.  When the
+GROUPS file is built initially from the active file, the time stamps
+are omitted which simply means that they are "old".
+.LP
+One or more of the following flags can be added to the GROUPS line to
+control \fInnmaster\fP's handling of the group:
+.TP
+.B D
+Causes \fInnmaster\fP to treat all articles in the group as digests,
+even when they don't initially look like digests.  Articles which are
+found not to be digests after all, are still not digested.
+.TP
+.B N
+Instructs \fInnmaster\fP to never digest any articles in the group.
+.TP
+.B O
+Disables the \-\fBO\fP option for this group, i.e. all existing
+articles will be included in the database (and they will not be
+removed if the \-\fBB\fP option is specified).  This flag should be
+set on groups which you never expire, or have a very long expire time!
+.TP
+.B R
+Causes \fInnmaster\fP to \fIrecollect all\fP available articles in the
+group whenever a new article is received.  This is said to be useful
+is some high-traffic clarinet groups with many cancelled articles.
+.TP
+\fB>\fP\fIfile\fP
+Instructs \fInnmaster\fP to \fIappend\fP all new articles to the
+specified file.  This makes it possible to keep specific groups out of
+the way of expire.  The archive file can be access directly from the
+\fInn\fP client using the \fIgoto-group\fP command.  The file name
+must be a full path name to a file in an existing, writeable directory.
+.TP
+.B @
+Instructs \fInnmaster\fP to completely ignore this group - this is
+equivalent to setting the group name to `@' as described above.
+.TP
+\fB!\fP or \fBX\fP
+Causes \fInnmaster\fP to ignore the group and not collect the group's
+articles in the database.
+.LP
+Comments (starting with `#' and continuing to the end of line) and
+empty lines are allow in the GROUPS file, but it is strongly
+recommended to keep the changes to the GROUPS file as small as
+possible, because of the implicit correspondence with the binary
+MASTER file.
+.LP
+It is not recommended to edit the GROUPS file while \fInnmaster\fP is
+running because it may add new groups to the file.  After editing the
+GROUPS file, the command
+.br
+	\fInnmaster\fP -G
+.br
+must be run before restarting the \fInnmaster\fP to parse and verify
+the new GROUPS file.
+.SH NNTP SUPPORT
+The \fInnmaster\fP can access the news articles from a local news
+spool directory as well as from an NNTP server.  When compiled with
+NNTP enabled, \fInnmaster\fP will compare the name of the NNTP server
+and the name of the local host; if they are identical, \fInnmaster\fP
+will bypass NNTP and access the articles directly.
+.LP
+When it has to access the news articles via NNTP, it cannot time-stamp
+the active file, so instead it transfers the entire active file from
+the NNTP server and compares it with a local copy of the last active
+file fetched from the NNTP server.  This is not very expensive in
+terms of cpu-cycles, disk-load, or net-bandwidth, but to stay on
+friendly terms with the NNTP server administrator, you should probably
+not use shorter update intervals than the standard 10 minutes.
+.LP
+Setting a much higher update interval than the standard 10 minutes is
+not really recommended either, since an update normally implies
+fetching a burst of news articles from the NNTP server, so setting the
+interval too long may imply that the load on the NNTP server will be
+more un-even.
+.LP
+In expire method 1, the use of XHDR just to get a list of existing
+articles in a group is definitely a waste of resources on the nntp
+server (but still lower than using method 3).  Before using
+the XHDR request, \fInnmaster\fP will send a
+non-standard "LISTGROUP" request; if the nntp server supports this
+request, it should return an OK_HEAD status followed by an (unordered)
+list of article numbers (one per line) terminated by a `.' line.  The
+nntp servers supporting this request will be much less loaded during
+expire.
+.LP
+The \-\fBO\fP option does not work with NNTP.  The \-\fBB\fP option
+will only work with NNTP if the \fInnmaster\fP is running on the NNTP
+server.
+.SH FILES
+The $db, $master, and $news names used below are synonyms for the
+DB_DIRECTORY, MASTER_DIRECTORY, and NEWS_LIB_DIRECTORY defined during
+configuration.
+.LP
+.DT
+.ta \w'$db/DATA/\fInnn\fP.[dx]'u+3m
+.\"ta 0 20
+$db/MASTER	Database master index
+.br
+$db/GROUPS	News group names and flags in MASTER file order
+.br
+$db/DATA/\fInnn\fP.[dx]	Database files for group number \fInnn\fP
+.br
+\&.../.nn[dx]	Database files if located in the group directories
+.br
+$master/GATE	Message channel from \fInnadmin\fP to \fInnmaster\fP
+.br
+$master/MPID	The process id of the \fInnmaster\fP daemon.
+.br
+$Log		The log file (the location is configuration dependent)
+.br
+$news/active	Existing articles and groups
+.br
+/usr/lib/nntp_server	Contains the name of the NNTP server.
+.DT
+.LP
+The MASTER file contains a record for each news group, occurring in
+the same sequence as the group names in the GROUPS file.  The sequence
+also defines the group numbers used to identify the files in the
+database's DATA directory.
+.LP
+The GATE file will be created by \fInnadmin\fP when needed, and
+removed by \fInnmaster\fP when it has read it.  Therefore, to send a
+message to the \fInnmaster\fP requires that you are allowed to write
+in the $master directory.
+.LP
+The contents of the Log file are described in the \fInnadmin\fP manual.
+.SH SEE ALSO
+nn(1), nncheck(1), nngrep(1), nntidy(1)
+.br
+nnadmin(1M), nnspew(8), nnusage(1M)
+.SH AUTHOR
+Kim F. Storm, Texas Instruments A/S, Denmark
+.br
+E-mail: storm@texas.dk

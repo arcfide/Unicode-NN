@@ -1,0 +1,21 @@
+;:AWelcome to the nn news reader;:A				;:ARelease ;:D;:A
+
+Unlike the other news readers you might be familiar with, the ultimate
+goal of nn is "not to read news"; actually, "nn" is an acronym for "No
+News", and the motto of nn is:
+
+	No news is good news, but nn is better.
+
+I hope that you will enjoy using nn.
+
+Three levels of online help is available:
+ ;:A?;:A	gives a quick reference guide for the current mode.
+ ;:A:help;:A	explains how to get help on specific subjects.
+ ;:A:man;:A	opens the online manual.
+
+Use ;:AQ;:A to quit nn.
+
+Have fun,
+
+Michael T. Pins
+

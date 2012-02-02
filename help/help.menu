@@ -1,0 +1,23 @@
+;:ASELECT (toggle);:A				;:AMOVE;:A
+a-z0-9	Specified article		,	Next menu line
+x-y	Range x to y			/	Previous menu line
+x*	Same subject as x		SPACE	Next menu page (if any)
+.	Current article			< >	Prev/Next menu page
+@ ~	Reverse/Undo all selections	^ $	First/Last menu page
+=regexp	Matching subjects (=. selects all)
+L/JJJJ	Leave/Change attributes		( )	Open/Close Consolidated line
+;:ASHOW SELECTED ARTICLES;:A
+SPACE	Show (only when on last menu page)
+Z 	Show NOW, and return to this group afterwards
+X	Show NOW, and continue with next group
+;:AGOTO OTHER GROUPS;:A
+X	Update current group, skip to next.	Y	Group overview
+N P 	Goto next/previous group.		~/.nn/init:
+G	Goto named group or open a folder.		Defines group
+B A	Go back/forward in groups already read.		presentation sequence.
+;:AMISCELLANEOUS;:A
+U  	Unsubscribe / Subscribe toggle		:man	Online manual
+F R M	Follow-up/Reply/Mail			:help	More online help
+S O E W	Save articles				!	Shell escape
+:post C	Post new article / Cancel current	"	Change menu layout
+:unshar :decode :patch	Unpack articles		Q	Quit nn

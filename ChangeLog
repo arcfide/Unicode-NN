@@ -1,0 +1,895 @@
+Unoffical Patch #17	(larry@garfield.cs.mun.ca Nov 19, 1991)
+
+	- core dump due to selecting last_article+1 on screen
+
+	- core dump due to consolidating (closing) last subject in a group
+  	  under certain circumstances.
+
+	- selecting consolidated articles with = command did not highlight
+  	  the selected consolidated articles correctly.
+
+	- fixed unconditional CLEAR TO END OF LINE that erased the next line on
+  	  some terminals.
+
+Unofficial Patch #18	(larry@garfield.cs.mun.ca;  Dec  1, 1991)
+
+	- possible core dump/strange behavior when using '=' command to
+	  return to the menu from article reading mode.
+	  (Reported by Olaf Schlueter [olaf@oski.toppoint.de])
+
+	- articles marked as A_LEAVE_NEXT ('=') are not given any special
+	  attention in consolidated menu mode.  I considered this incorrect
+	  (I leave stuff around all the time :) and modified nn's behavior
+	  to notice them.
+
+	- unable to de-select an auto-selected subject when using
+	  consolidated-menu mode.
+
+Patch #17 and #18 made official (peter@DIALix.oz.au)
+
+Patch #19		(peter@DIALix.oz.au; 28 Nov 92)
+
+Title:	Reduction in startup time
+From:	Geoff Collyer <geoff@world.std.com>
+	The initial startup time can be cut in half.
+
+Title:	A/UX 3.0 support
+From:	Jim Jagielski <jim@jagubox.gsfc.nasa.gov>
+	Support for Apple A/UX 3.0, originally by Alexis Rosen
+
+Title:	NeXT-2.2 support
+From:	Lele Gaifax <lele@itnsg1.cineca.it>
+
+Title:	Misc "static" function declarations corrected in prototypes.
+From:	Lele Gaifax <lele@itnsg1.cineca.it>
+
+Title:	NNTP name canolicalization in /usr/lib/nntp_server vs gethostname()
+From:	Mark R. Levinson <chicken@minerva.npac.syr.edu>
+	The code now converts the name from nntp_server to the official name
+	before comparing it to the gethostname() result.  This is useful if
+	nntp_server points to an alias (ie: news.your.domain.name)
+
+Title:	Count lines if no "Lines:" field present.
+From:	Paul Eggert <eggert@twinsun.com> and Luc Rooijakkers <lwj@cs.kun.nl>
+	If there is no "Lines:" field, NN will count them.
+
+Title:	Correct line counting algorithm conflict with NNTP and folders/digests.
+From:	Peter Wemm <peter@DIALix.oz.au>
+	The code would attempt to fetch a sub-article from a folder or
+	digest from the NNTP server - which is clearly not possible...
+
+Title:	Make line counting optional
+From:	Peter Wemm <peter@DIALix.oz.au>
+	#define DONT_COUNT_LINES option to config - it is undesirable to
+	fetch all articles from a remote NNTP server just to display a 
+	line count on the menu.
+
+Title:	print a "??" instead of "-1" for lines count in some display modes
+From:	J. Porter Clark <jpc@avdms8.msfc.nasa.gov>
+	If you change the "layout", it is possible for NN to display a -1
+	in the lines count field.
+
+Title:	Timezone misalculations
+From:	Paul Eggert <eggert@twinsun.com>
+	NN mishandled non-GMT timezones in sorting resulting in articles being 
+	presented out of order.
+
+Title:	NNGRAB speedups
+From:	Paul Eggert <eggert@twinsun.com>
+	nngrab generated unnecessary files and processes (especially on
+	BSD'ish machines that do not have a built-in "[" in the shell
+
+Title:	NN wastes time seeking to find the file size
+From:	Paul Eggert <eggert@twinsun.com>
+	Make NN count bytes as they are read rather than seeking all over the 
+	place.
+
+Title:	Correct NN's header parser to RFC compliant behavior
+From:	Paul Eggert <eggert@twinsun.com>
+	NN gets confused on some variations of legitimate header continuation
+	lines.
+
+Title:	Remove defunct comp.ai.neural-nets digest special handling
+From:	Paul Eggert <eggert@twinsun.com>
+	The comp.ai.neural-nets digests are now in standard form.
+
+Title:	Improve ":decode" to recognize more formats
+From:	Mark Rawling <Mark.Rawling@mel.dit.csiro.au>
+	Fix for fault in the chtbl code
+
+Title:	Add a "ignore-formfeed" variable
+From:	Romain King <romain@pryamid.com>
+	Special request: display "^L" instead of a page break.  Not on
+	be default.
+
+Title:	Fix that darn "NO DIRECTORY (ok)" message that nnmaster is so fond of.
+From:	Steve Simmons <scs@lokkur.dexter.mi.us>
+	If nnmaster is going to complain about a missing directory, at least
+	say which one it is....
+
+Title:	get aux script to clean up common editor backup files
+From:	Minh Tran-Le <mtranle@paris.intellicorp.com>
+	Emacs makes file~ backups, some make file.bak, etc. Try and clean
+	up a few of them after launching an editor.
+
+Title:	make aux script generate control messages that INN will accept.
+From:	Peter Wemm <peter@DIALix.oz.au>
+	INN's inews is pretty fussy in what it will accept..
+
+Title:	Resolve conflict NN with INN on SVR4/386
+From:	Peter Wemm <peter@DIALix.oz.au>
+	SVR4/386 has an "interesting" feature: You can write to a file
+	with mmap() **without** updating the timestamps....
+	INN uses this for the active file, nnmaster now has a "-U" switch
+	to force an unconditional scan of the active file after the timeout,
+	rather than if the timestamps changed.
+
+Title:	VMS ANU-NEWS compatability
+From:	Matt Heffron <heffron@falstaff.css.beckman.com>
+	VMS ANU-NEWS's NNTP returns a different error code on no-such-article
+
+Title:	Log group that generated a nntp error
+From:	Matt Heffron <heffron@falstaff.css.beckman.com>
+	If a NNTP error is generated, log the group that caused it.
+
+Title:	Support terminals without clr_eol capability
+From:	Luc Rooijakkers <lwj@cs.kun.nl>
+	Some ancient terminals cannot clear to end-of-line. Simulate it by
+	outputting spaces. This means that printf/puts/putchar/stdout can
+	no longer be used in visual mode, because term.c has to keep track
+	of the cursor position. Use the new tprintf/tputc instead (but only
+	from files that are always linked with term.o). A list of the files
+	that may do printf/puts/putchar/stdout is in `noterm'.
+
+Title:	Miscellaneous cleanup of term.c
+From:	Luc Rooijakkers <lwj@cs.kun.nl>
+	Use tputs correctly unless BROKEN_TPUTS is #defined (UNISYS?)
+
+Title:	Allow backslash to escape semicolons in extra headers
+From:	Luc Rooijakkers <lwj@cs.kun.nl>
+	This is necessary to let the user add a MIME Content-Type header
+	via the news-header or mail-header variables.
+
+Title:	Fixed annoying cursor position during some messages
+From:	Luc Rooijakkers <lwj@cs.kun.nl>
+	Don't reposition the cursor to the prompt line after a message
+	if the message has overwritten the prompt.
+
+Title:	Fixed invisible error messages
+From:	Luc Rooijakkers <lwj@cs.kun.nl>
+	If terminal has a separate `visual mode' screen, printf/nn_exit
+	sequences don't work. Replaced user_error by nn_exitmsg which has
+	the exit status as additional first argument, and replaced the
+	printf/nn_exit sequences by calls to nn_exitmsg
+
+Title:	Added charset variable and 8-bit checking for posts
+From:	Luc Rooijakkers <lwj@cs.kun.nl>
+	The new charset variable can be set to the character set of the
+	terminal. It also determines the default value of the
+	data-bits variable.
+	If a message is posted whose body contains 8-bit characters
+	and charset is not set to "unknown", nn will add MIME-Version
+	and Content-XXX headers indicating its character set.
+	Such messages cannot be posted if the current character set
+	is a 7-bit set.
+	To obtain the previous behaviour, do `set charset unknown'.
+
+Title:	Cleaned fill/nofill use in nn.1.* files
+From:	Luc Rooijakkers
+	Lots of examples in the manual were being filled by *roff.
+
+Title:	Sped up aux.sh and made it more portable
+From:	Luc Rooijakkers
+	Using case instead of if is faster on shells that don't have if
+
+Title:	Preview mode and menu.c
+From:	Steven Grimm <koreth@hyperion.com>
+	The symptom: previewing (usually via auto-preview-mode) an article on
+	the next-to-last page of a group menu then going to the last page of
+	the menu caused nn to dump core if the previewed article had a greater
+	article number than the last article on the last screen.  For example,
+	viewing article 'h' would cause the problem if the last screen only
+	went up to 'e'.
+
+Title:	Correct a small over-optimization in term.c
+From:	Luc Rooijakkers
+	My term.c contained one cursor position update too many, causing
+	things to go wrong sometimes.
+
+Title:	DecStation/Ultrix 4.2 support
+From:	"stolen" from Toivo Pedaste <toivo@uniwa.uwa.edu.au> my Peter Wemm.
+	conf/m-dec3100.h for mips machines running Ultrix.
+
+Title:	Misc cleanups of bad code
+From:	Paul Eggert <eggert@twinsun.com>
+	The code is loaded with functions that return no value, etc.
+	This is a start at fixing some of the more serious faults.
+
+Title:	Macro to call metamail
+From:	mikew@kpc.com
+	A simple example macro for passing MIME articles to metamail
+
+Title:	Bug in folder code procuces core dump.
+From:	Stefan Schwarz <stefans@bauv106.bauv.unibw-muenchen.de>
+
+Title:	rfmail support
+From:	Bo Kullmar <bk@kullmar.kullmar.se>
+
+Title:	Clean up code part 2
+From:	Peter Wemm <peter@DIALix.oz.au>
+	Continued on from what Paul Eggert started... AARRGGHH!! It's a mess!
+
+Title:	Update help screens
+From:	Peter Wemm <peter@DIALix.oz.au>
+	As suggested by Bill Wohler <wohler@sap-ag.de>, sort out the help
+	pages to "clarify" the differences between a few commands, and to
+	add the "(" and ")" keys.. [darn.. It's a tight fit in there.]
+
+Title:	Domain/OS fixes and others
+From:	Michael T Pins <mtpins@icaen.uiowa.edu>
+	1> Makes nnmaster run much happier on HP/Apollo's running Domain/OS
+	2> Allows nn to compile on variants of HP-UX, among others, that it
+	   won't compile on otherwise.
+
+Title:	aux.sh fixes
+From:	Peter Wemm <peter@DIALix.oz.au>, bug reports from many...
+	The changes to aux.sh to use "here documents" broke a lot of
+	/bin/sh's Hack them out of the code, as not everybody has ksh.
+
+Title:	SunOS 4.1 supports window siziing
+From:	Paul Eggert <eggert@twinsun.com>
+	Add a change to s-sunos4-0.h
+
+Title:	Add support for PCS Cadmus with MIPS cpu
+From:	Peter Pichol <pp@informatik.uni-kiel.dbp.de>)
+	Create m-pcs.h
+
+Title:	Add support for DEC Alpha's running OSF/1
+From:	Mike Wexler <mikew@kpc.com>
+	Create m-alpha.h and s-osf1.h
+
+Title:	A way to read even less news!
+From:	Keld.Simonsen@dkuug.dk
+	It has been an old desire (viz. the FAQ) to be able to skip
+	followups to subjects, one did not care to read. The following two
+	variables implement a way to omit these followups, plus a way to
+	auto-select the articles that you are most likely to be interested
+	in, namely followups to articles that you have already read, or
+	followups to articles you have posted yourself.
+
+	The killing of uninteresting followups is done without entries in
+	the kill file. The thread is killed if the root article of the
+	thread is a followup itself, and the subject is not selected.
+
+	The default of this patch to nn is no changed behaviour.
+
+	Two new variables are introduced, can be set in the .nn/init file:
+
+	ignore-re  (boolean, default false)
+	If set, articles with subjects already seen in a previous
+	invocation of nn or another newsreader - and not auto-selected -
+	are automatically killed.
+
+	auto-select-rw (boolean, default false)
+	If set, a subject of an article read or posted is automatically 
+	used for subsequent auto-selecting (if not already selected).
+
+Title:	Fixes for non ANSI SunOS cc
+From:	Paul Eggert <eggert@twinsun.com>
+
+	NN 6.4.19gamma's term.c contains a cast that assumes that the
+	compiler is an ANSI C compiler.  This doesn't work in K&R
+	compilers (e.g. SunOS 4.1.2 with bundled cc).
+
+Title:	void vs int mixups in return values
+From:	Paul Eggert <eggert@twinsun.com>
+	Here's a patch to NN 6.4.19gamma's term.c that fixes a problem
+	where it returns a value in a void function.
+
+Title:	After you `:set record xxx', `:set' misdisplays mail-record
+From:	Paul Eggert <eggert@twinsun.com>
+	The :set listing were incorrectly displaying mail-record and
+	news-record as always unset.
+
+Title:	Improvement/bug fix to nn: archiving full articles using NNTP
+From:	Fred Hucht <fred@hal6000.thp.Uni-Duisburg.DE>
+	If you set nnmaster to archive articles while in NNTP mode, it
+	only archived the headers...
+
+Title:	Add a flag to show Originator
+From:	Jim Jagielski <jim@jagubox.gsfc.nasa.gov>
+	Add's support for 'J' in news-header to display the "Originator:"
+
+Title:	Catch short term error conditions to prevent nnmaster aborting.
+From:	J.P.M. van der Jagt <jeanpaul@duteca.et.tudelft.nl>
+	Prevent things like "400 Server load too high, try again later"
+	from making nnmaster exit.
+
+Title:	make nn 6.4 PL18 compile (and work ;-)) for hp_ux 8.0.
+From:	Bart Muyzer <bartm@cv.ruu.nl>
+
+Title:	`nn -xXm' does't clear to end of line (NN 6.4.19gamma)
+From:	Paul Eggert <eggert@shadow.twinsun.com>
+	NN wasn't properly clearing to end-of-line after each output
+	line.
+
+From:	Paul Eggert <eggert@twinsun.com>
+Title:	infelicities in NN 6.4.19gamma term.c
+       	The term.c code had some really bizzare conditional tests that
+	were uncessesary, and some were obvious typos.  This patch doesn't
+	fix any real bugs, but it removes the needless code.  It also
+	introduces a few optimizations in critical places: (This is a
+	particularly big win on most Sparcs, which don't have integer
+	division.)
+
+From:	Peter Wemm <peter@zeus.DIALix.oz.au>
+Title:	silly bug in nn-use-elm script
+	contrib/nn-use-elm had a leading  #/bin/sh instead of #!/bin/sh
+	This causes invocation of csh on many systems... (including mine :-)
+
+From:	Peter Wemm <peter@zeus.DIALix.oz.au>
+Title:	long standing bug in sort.c
+	non-related articles were often being associated in
+	subject-match-parts mode.  This tries to make it less likely.
+
+From:	Steve Grimm <koreth@hyperion.com>
+Title:	prefix.c fix, HAVE_TRUNCATE for SunOS.
+	prefix.c change #ifdef NNTP to #ifdef INEWS_PATH
+	SunOS has truncate.
+
+From:	Michael Masterson <mjm@thumper.progcons.com>
+Title:	account.c is broken
+	The code uses a structure before defined if accounting is enabled.
+	Update s-sys5-4.h.  m-i80386.h needs work.
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	improve m-i80386.h
+	m-i80386.h didn't deal with network byte order very well.  As far as
+	I can tell, if you want network byte order, then you probably want it
+	for NFS sharing.  In which case you have TCP/IP.  Use it's routines.
+
+From:	Steven Grimm <koreth@hyperion.com>
+Title:	Patch for preview mode display glitch
+	the 'xn' termcap flag is conflicting with clrline() and long
+	subject lines, causing the following line to be cleared.
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	fix aux.sh
+	aux.sh was failing when using the nn_elm script from the FAQ.
+	In the process of reformatting it, I found the bug, a missing
+	semicolon.  It would fail whenever mailer-pipe-input was unset.
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	The Biggie!  Merge in NOV code!
+	Well, this is the big one.  #ifdef NOV in config.h, and it even works
+	over NNTP.  The some of the hacks to get NN to use the libnov code is
+	pretty baroque, but necessary in order to maintain compatability.
+	NN's internals are *very* dependant on the nnmaster database and it
+	does not particularly appreciate the change.  If you enable NOV, all
+	bets are off. :-)  Most of the code is from Geoff Collyer
+	<geoff@world.std.com> although the NNTP mods and other tweaks are
+	from others whom I cannot identify..
+	This is very much a Stop-Gap solution.
+
+From:	Michael Masterson <mjm@thumper.progcons.com>
+Title:	auto-select-rw and maybe ignore-re kill folder mode
+	NN takes a SEGV while reading a folder with these enabled.
+	[Peter: I'm unable to reproduce the bug....]
+
+From:	Steven Grimm <koreth@hyperion.com>
+Title:	Patch for ignore-re and -x
+	Here's a tiny patch so that ignore-re is turned off when you're
+	using the -x flag, or when you go into a group to read old
+	articles.  I think this is better than the way it currently works;
+	currently, if you have ignore-re set on a group, there's no way
+	(that I can discover) to get nn to show you an article whose
+	thread's initial article has expired.
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	folder move vs. auto-select-rw
+	Basically, patch up Michael Masterson's problem.  Although I
+	couldn't core dump (lucky me..), I did notice that if I was
+	reading a folder, the articles I read were added to the kill file.
+	I've added a temporary override to auto-select-rw that makes it
+	ignored in a folder.  This should fix Michael's problem.
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	6.4.19 is no more.
+	So as to distinguish out butchering from Kim's work, we've decided
+	on a revision "bump".  It's NN-6.5 now.
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	gcc -Wall cleanup
+	It now compiles a lot more cleanly under -Wall, but not 100%
+	clean..  :-)  I found some sneaky bugs in the menu code and the
+	init file parser in the process.
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	Merge in Article search from Andy Burgess <aab@cichlid.com>
+	There are numerous collisions with the NOV code, and it does not
+	work with digests, etc, etc.  It is *not* enabled in config.h by
+	default, as It has not revieved enough testing by the group.
+	It's also not documented in the manual... (Volunteers?)
+	Also, don't enable this if you read via nntp... Your server will
+	hate you...
+
+-- 6.5.0 beta goes out Aug 31 1993 --
+
+From:	Paul Eggert <eggert@twinsun.com>
+Title:	The code still says 6.4 in various files, including the documentation.
+
+From:	Paul Eggert <eggert@twinsun.com>
+Title:	Bogus prototypes for syslog() functions are wrong.
+
+From:	Paul Eggert <eggert@twinsun.com>
+Title:	NO_X_NEWSREADER should be defined by default.
+	[Peter: Awww!  If Tin can do it, why can't I? :-) ]
+
+From:	Paul Eggert <eggert@twinsun.com>
+Title:	Redeclaration of catch_winch on machines with RESIZING
+
+From:	Paul Eggert <eggert@twinsun.com>
+Subject: nn-6.5.0 mishandles time zone changes near short month boundaries
+	NN 6.5.0 mishandles non-GMT time zones near short month
+	boundaries, which causes articles to be incorrectly sorted by
+	date.  For example, pack_date("30 Sep 1993 23:00 -0700") and
+	pack_date("1 Oct 1993 06:00 GMT") should yield the same value, but
+	in NN 6.5.0 the former yields 3614760 while the latter yields
+	3616200.  This is becoming more and more of a problem as more
+	people use non-GMT time zones in their news.  Here is a patch.
+
+From:	Toivo Pedaste <toivo@uniwa.uwa.edu.au>
+Title:	Missing 'static' on some functions
+	db_init_group(), catch_winch(), grep_article()
+
+From:	Steve Davies <srd@peora.sdc.ccur.com>
+Title:	signal prototypes misdeclared
+	There were a few places where signal handlers were declared void,
+	but in fact were sig_type. This was OK on machines that had the
+	same definition, but not on those with sig_type == int.
+	Also, truncate() is messed up..
+
+From:	Steve Grimm <koreth@hyperion.com>
+Title:	tidy up config.h
+	There were a few typos and errors in config.h-dist
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	fix up prototype problems with truncate and gethostname
+	It seems every system has a different idea on what they are supposed
+	to be.  I give up...  NN has not got internal functions called
+	nn_truncate and nn_gethostname, which are prototyped, and will call 
+	"the real thing" if it's available.  It seems the safest way.
+
+From:	Steve Davies <srd@peora.sdc.ccur.com>
+Title:	6.5 NOV + NNTP cleanups
+	NN + NNTP + NOV : db.c, global.h, nn.c, nntp.c
+	- This patch fixes problems when NN is run on the same machine as
+	the NNTP server.
+	- When compiled with NNTP and NOV, a temp file was being created
+	when the active, active.times, and .overview files were read from
+	the NNTP server.  This patch eliminates the creation of that
+	temporary file.  In db.c (readactfile, readtimfile,
+	db_read_group), instead of reading from the temp file, the data is
+	read directly from the NNTP server.  The idea for this comes from
+	Peter Orbaek (poe@daimi.aau.dk).  This requires a simple patch to
+	the nov sources (which probably should be applied by hand rather
+	than running this file through patch):
+	[NOTE: NN-6.5 contains a 'nov-lite' distribution with this patch
+	applied and everything non-essential for NN removed. -Peter ]
+
+--- nov/libnov/oldlib.c	Tue Sep  7 13:47:31 1993
++++ nov/libnov/lib.c	Tue Sep  7 13:47:42 1993
+@@ -213,6 +213,7 @@
+ 	}
+ 
+ 	while ((line = fgetms(gp->g_stream)) != NULL) {
++		if (line[0] == '.') break;
+ 		art = (struct novart *)malloc(sizeof *art);
+ 		if (art == NULL ||
+ 		    (prssts = prsovline(line, gp, art, prevart)) == PRSFAIL) {
+
+
+	- The code in db_read_art for handling crossposts when NOV is
+	defined does not handle the (hypothetical?) case where there are
+	extra headers besides Xref: in the .overview file.  It also
+	doesn't work when cnews is used to maintain the .overview files,
+	since cnews appears to use xref: instead of Xref: in the .overview
+	file.  A new routine "db_fixup_cross_postings" is added to db.c .
+	This routine is derived from code by Charles Henrich and
+	rmtodd@servalan.servalan.com.
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	include a minimal nov distribution.
+	Because we need a trivial patch to the libnov code which Geoff
+	Collyer doesn't want to put in his code (and quite understandably
+	because it's a "hack"), and I dont want 10,000 email messages
+	saying "NOV + NNTP doesn't work" when they build it without
+	patching because they never read intructions that tell them to
+	patch it. :-)  If anybody does this to me now because they've
+	removed the patched version, I'll reply with a uuencoded 16 Meg
+	kernel crash dump. (ie: a bunny dropping..) :-)
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	Fix "Out of memory: cannot allocate -4 bytes"
+	If NN could not determine the window size from the termcap or the
+	TIOCGWINSZ ioctl's, it would try and malloc a negative buffer..
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	typo in nn_gethostname()
+	hostname.c would not compile if HAVE_HOSTNAME defined.
+
+From:	Jim Jagielski <jim@jagubox.gsfc.nasa.gov>
+Title:	nn -a0 botches display on some hosts
+	There is some interaction between curses, tprintf, and terminfo.
+
+From:	Jim Jagielski <jim@jagubox.gsfc.nasa.gov>
+Title:	Add new conf/s-aux3-0.h
+
+From:	Robert.Stockton@ELROND.GANDALF.CS.CMU.EDU
+Title:	nov code overrunning '.' on XOVER data when active is incorrect.
+	If the active file says there is articles, but the .overview is
+	empty, the novall() and novnext() miss the "eof" dot and hang
+	forever.
+
+From:	Toivo Pedaste <toivo@uniwa.uwa.edu.au>
+Title:	Explicit support for mouse under xterm
+	This code can detect if running under xterm, and will enable mouse
+	events if so.  The mouse clicks are used for menu selection,
+	reading, previewing and so on.  It makes NN "almost" hands-free
+	for most news reading tasks.
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	Minor tweaks for mouse-code
+	Because of a "feature" apparently in the SYSV termio driver and
+	possibly the POSIX termios, NN was disabling raw mode during
+	screen updates in order to enable xon-xoff flow control to work.
+	This was causing character echoing of mouse events during screen
+	redraws and looked rather ugly.  This problem never occurs on
+	older BSD systems with the sgtty style driver.  This tweak causes
+	NN to not switch off raw mode on Xterms when mouse is enabled..
+	Heck, if xterm needs flow control, something is very wrong...
+
+From:	Tom Limoncelli <tal@warren.mentorg.com>
+Title:	Possible memory leaks
+	Purify is not at all happy with some of the things that the NOV
+	code does.  I dont think there is much of a problem, although I
+	agree that it's messy.  Basically, NN is allocating buffers for
+	the hash tables and not freeing them at exit.  As these are reused
+	while NN travels from group to group, this is mostly static.
+	NN does not free() these on exit and Purify complains.  The
+	invitation to fix this is open to all.. :-)
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	major reorganisation of NOV code.
+	Shift files from nov/* to the top level directory for radical
+	simplification of compilation.  Rationalise include files.
+	Substitute some simple routines to reduce extra files needed from
+	the NOV distibution.
+
+From:	Peter Wemm <peter@DIALix.oz.au>
+Title:	major repairs of above reorganisation.
+	Well, the "simple" reorganisation turned out to be rather dramatic
+	in it's affects.  This cost weeks of debugging and nearly caused
+	me to give up and reverse the last upmteen patches (I had
+	neglected to do a CVS checkin before starting).  It turned out to
+	me a malloc problem.  I *suspect* there is still a memory leak
+	there, but it doesn't seem to show up on the process size after a
+	lengthy reading session..
+
+From:	Ian Nicholls <iann@storesys.coles.oz.au>
+Title:	NCR tower 32 tweaks.
+	nn-6.5.0.b2 had troubles with include files.  This helps a bit.
+
+From:	Marc Boucher <marc@cam.org>
+Title:	additions to conf/s-sys5-4.h
+	This adds some omissions to the config file.
+
+From:	Marc Boucher <marc@cam.org>
+Title:	bzero/memset are out, clearobj is in...
+	Following Kim's coding conventions, change a couple of memset()'s
+	that I introduced to clearobj's.  This looks a lot nicer now..
+
+From:	Michael Pins <mtpins@isca.uiowa.edu>
+Title:	b4 patch
+	An nntp speedup, along with changing a number of chars back to ints so
+	nn will actually work properly on a number of systems.
+
+nn-6.5.0.b5:
+From: mcm@gorgon.unx.sas.com (Mike Mitchell)
+Subject: Re: Problems with splitting digests
+	Digests are now split under NOV.
+
+From: romain@sword.eng.pyramid.com (Romain Kang)
+Subject: NN hacks for NOV
+	Major NOV hacks.  Things should be rather faster now.
+	Also, the addition of nnview for reading folders.
+
+From:   Michael Pins <mtpins@isca.uiowa.edu>
+	General bug-fixing and patch cleanup.
+
+nn-6.5.0.b6:
+From lar3ry@zk3.dec.com
+Subject: OSF/1 (err, Digital Unix) patches
+	Fixes for the Alpha and OSF/1.
+
+From: David Dyer-Bennet <ddb@gw.ddb.com>
+Subject:  s-linux.h
+	config file for linux
+
+From: jpc@hammer.msfc.nasa.gov (J. Porter Clark)
+Subject: libnov.c bug
+	There's a bug in the code that causes .newsrc to be updated even though
+	the corresponding articles aren't read.  Swapped the order of the test.
+
+From: Jacob Martin Bohn Lorensen <jablo@diku.dk>
+Subject: timeout problem with NOV and nntp
+	When the server unexpectedly breaks the connection nn does not always
+	discover this.  This can be fixed by just re-opening the connection.
+
+From:   Michael Pins <mtpins@isca.uiowa.edu>
+        General bug-fixing, patch cleanup and code cleanup.
+ 
+nn-6.5.0.b7:
+From: <root@oit.gatech.edu>
+	config files for AIX/RS6000, and a patch for AIX brain damage.
+
+From:	Michael Pins <mtpins@isca.uiowa.edu>
+	Put accounting logs under LIB instead of DB, so DB isn't needed
+	unless nnmaster is used.  Pulled accounting #def's out of account.c
+	into the new account.h so it's no longer necessary to edit a .c file.
+
+	Fixed line counting in digests (used to claim one too many).
+
+	Included the inst.sh file for the Apollo I've been using for years.
+	Anyone running Domain/OS will want to use this instead of inst.sh.
+
+	Yet more general clean-up.
+
+nn-6.5.0:
+	Added account.h to account dependencies.
+
+	Added freebsd config file.
+
+	Hacked together some docs for nnview.
+
+	Yet even more general clean-up.
+
+nn-6.5.1:
+	Added netbsd config file.
+
+	Fixed up s-template.h.
+
+	SunOS doesn't have memmove (and likely neither do most older BSD
+	derived systems).  Early versions of Solaris don't have bcopy....
+	Added NO_MEMMOVE and used it to ifdef around these.  Most (all?)
+	can probably be memcpy, but until I have time to insure that the
+	args don't overlap, I'll be paranoid.
+
+nn-6.5.2:
+	Changed group_number to int32 so > 32767 groups works
+
+	Fixed problem with long References: lines
+
+	Fixed problem with large headers (seen mainly in nnview)
+
+	Hacked in a workaround for sites that don't support 
+	LIST active.times
+	nn will now see new groups properly
+
+	More general cleanup of the code and minor bug fixes
+
+From: mtranle@theoden.intellicorp.com (Minh Tran-Le)
+	nn was eating the first number from a LIST response
+	workaround for M$ newsserver braindamage
+
+From: Nick.Holloway@alfie.demon.co.uk (Nick Holloway)
+	fix for INN return message re: mail to moderator
+
+nn-6.5.3:
+	Ripped out "LIST active.times" workaround.  Typhoon will support it
+	soon (likely before anyone reads this), and the workaround had bugs.
+
+	Changed accounting so that time used outputs HH:MM instead of HH.MM
+	(does anyone still use accounting?)
+
+	Added a compile time option to turn on more headers to make the
+	GNKSA people happy.  The default behavior hasn't changed.
+
+From: Bruce Fisher <bruce@smtl.co.uk>
+	The news spool directory was hardcoded in libnov.c, conflicting
+	with NEWS_DIRECTORY from config.h
+
+From: Dale Talcott <aeh@quest.cc.purdue.edu>
+	A new variable "cross_post_limit" to kill articles posted to more
+	than cross_post_limit newsgroups.  Default=0 (no limit).
+
+From: Dale Talcott <aeh@quest.cc.purdue.edu>
+	bug in pack_date.c--computes leap year incorrectly
+
+From: Tom Kartes <tom@zeus.Materna.DE>
+	Killing the current article sometimes kicks you out of the newsgroup.
+
+From: Tom Kartes <tom@zeus.Materna.DE>
+	Saving an article into a file will escape some headerlines if
+	you're using NOV and did not previously view this article.
+
+From: 5ar4ro$ri7@bogon.com (John Henders)
+	a patch that adds S)ign [pgp] as an option to the posting menu
+
+From: "Maarten Carels" <maarten@ic.uva.nl>
+	new config.h option to have a different filename for the
+	overview files
+
+nn-6.5.4:
+	Changed defaults in config.h to more sane ones.
+	Fixed a bug in libnov.c so NOV_FILENAME actually works.
+	Fixed a nasty bug that would occasionally cause nn to go ballistic
+	when ripping a digest if the overview data wasn't quite right.
+	nn now compiles cleanly on FreeBSD.
+
+nn-6.5.5:
+	Changed answer.c to use 4-digit year (making it RFC-822
+	non-compliant, but son-of-rfc-1036 compliant).
+	Back-ported pack-date.c from nn7.  It fixes a number of minor bugs,
+	and deals with Y2K brain-damage from other software.
+
+nn-6.5.6:
+	Fixed two new date sorting bugs.  Oops.
+	Workaround for new brain-damage in Solaris7 include files.
+
+nn-6.6:
+	Fixed large uid/gid problems
+	Fixed Cc (it actually works now)
+	changed X-Newsreader to User-Agent
+	changed -ltermcap to -lncurses in s-linux.h, as they broke it again
+	the date parser now translates 101 -> 2001 (yes, I'm still seeing this)
+	backported some changes to decode from nn7
+
+From: Dave Olson <olson@bengaltech.com>
+	added NNTP_AUTH support
+	added ssl support
+	nn now posts internally via NNTP (NNTP only)
+	all functions of aux now internal (NNTP only)
+	added support for multiple nntp-server/newsrc/nn-directory
+
+From: Charles Lindsey <chl@clw.cs.man.ac.uk>
+	aliased groups didn't work correctly with NOV/no-NNTP
+
+From: jpc@suespammers.org (J. Porter Clark)
+	added E = save-header-only function
+
+nn-6.6.1:
+	online help files will now get installed properly.
+	now compiles if nntp isn't defined.
+	dumped core on posting if news-record had a bad path.  Fixed.
+	no longer segfaults if user over quota.
+	no longer segfaults if NNTPSERVER is invalid.
+	will now search path for executables.
+	passwords longer than 8 chars now work from Solaris.
+	nn will silently ignore any non-digests with [D,d]igest in the
+		subject, and apparently has for quite some time.
+		set the default for also_full_digest to true as workaround.
+	nn has long gotten all the articles in a group when any number of
+		extra articles was requested.  Fixed.
+	will now reconnect if it times out during a post.
+
+nn-6.6.2:
+	nn wouldn't compile if NNTP was defined and NOV wasn't.  Fixed.
+
+nn-6.6.3:
+	cpp is broken on gcc-3.x.  Worked around.
+	ripped out SSL support, as it was apparently fatally broken.
+	removed nnmail and HAVE_ROUTING.  No longer needed.
+	converted from varargs to stdargs.
+	added MacOS X support
+	nn will now attempt to discover the domain if not defined.
+	will now reconnect, even to broken servers that don't send 503
+
+From: Bob Hain <bob@me.umn.edu>
+	use full_name instead of pw_gecos in gen_frompath
+
+nn-6.6.4:
+	added iso-8859-15 to chset
+	increased END_OF_LIST (some servers have very large article numbers)
+	changed ospeed to nnspeed to avoid namespace conflicts
+	always rebuild binary killfile when starting nn(NOV)
+	if the ORGANIZATION environment variable is set, nn will use it
+	the editor again accepts arguments, and starts after the headers
+	added new variable use-editor-line, for the above
+
+From: Jacques A. Vidrine <nectar@FreeBSD.org>
+	nn has a remote security hole.  Fixed.
+
+From: Felicia Neff (fn@panix.com)
+	the variables for nn_exitmsg when nn is already running were swapped
+
+nn-6.6.5:
+	added -lcurses to macosx TERMLIB
+	nnview doesn't need to talk to the NNTPSERVER
+	removed last vestige of sys_errlist
+
+From: J.K.Wight@newcastle.ac.uk
+	cp is undefined if DOMAIN is defined and HIDDENNET isn't.  Fixed.
+
+From: Neil W Rickert <rickert@cs.niu.edu>
+	nn segfaults if it reconnects during initial authentication.  Fixed.
+
+From: Jeffery Small <jeff@cjsa.com>
+	nn sends a bogus [post|follow] failed message when using cnews and
+	!nntp.  Fixed.  (re-added two options to config.h)
+
+
+nn-6.7alpha:
+	Fixed some portability problems with old OSs.
+	First pass at starting to clean up the code.  Ick, what a mess.
+	nnmaster and nnacct appear to have been broken during nn-6.6, fixed.
+	The name length displayed is now based upon the width of the screen.
+	nn will now correctly parse From: lines that contain ()
+		For example:
+		    From: "Jesse James (home)" <jjames@example.com>
+		used to display as "home", the new behavior will display
+		it as "Jesse James".  However, this may affect killfiles
+		that depend upon the old behavior.
+		To use the old behavior, set the new run-time variable
+		'old-packname' to true.
+	The hold command from the post/mail menu failed if the users
+		nn_directory wasn't a local filesystem.  Fixed.
+	nnpost didn't check to see if there was a held message.  Fixed.
+	Posting from nnview failed due to the nntp connection not being
+		setup.  Fixed.
+	When replying with a held message, nn would use the post menu.  Fixed.
+	Header check macro is now case insensitive for both news and folders.
+	Added GPG support, which comes with a new run-time variable
+		'sign-type', and a compile-time variable SIGN_TYPE to set
+		the default to either pgp or gpg.
+	nn will now print the version before connecting to the newsserver
+	internalized :bug information for more accurate reporting
+	nn will now look in /etc/resolv.conf for a domain if DOMAIN isn't
+		defined and hostname isn't a FQDN.
+	new command ":show config" will show the compile-time definitions.
+
+From: Henning Schmiedehausen <hps@intermeta.de>
+	If query-signature wasn't set, nn ignored signature-append-post.
+	Fixed.
+
+From: Tim <tim@sleepy.wojomedia.com>
+	nntp-user and nntp-password should be settable in the init file.
+	Fixed.
+
+From: Steve Rumble <rumble@ephemeral.org>
+	nn segfaults if a client is unable to resolve it's own name.
+	Fixed.
+
+From: flaps@dgp.toronto.edu (Alan J Rosenthal)
+	nn should trim long References: lines.  Added patch to do so.
+
+nn-6.7beta:
+	Cleaned up some old (unused) variables.
+	More general code cleanup.
+	Updated the manpages to include new variables.
+	Updated INSTALLATION and other docs so they're (roughly) current.
+	If new-group-action is set to 0 in init, nn will no longer get
+		active.times.  (Yes, this is what the docs have claimed was
+		always true, it actually works now.)  This can cut startup
+		time in half on slower links.
+
+nn-6.7.0:
+	And yet even more general code cleanup.
+	rearranged startup code so macros and keymaps work in the init file.
+	only query-signature if .signature exists
+	fixed some portability problems with NeXTstep-3.3 and NetBSD
+
+nn-6.7.1:
+	declared main to be int in usercheck.c and cvt-help.c
+	changed a few refs to nn-6.5 and nn-6.6 to nn-6.7
+	clear display before printing "No News" so as to not overwrite
+
+nn-6.7.2:
+	changed TERMIO to TERMIOS in s-linux.h
+	execute needs to exit, not return, if exec fails
+	callable programs (i.e pager) should accept arguments
+
+nn-6.7.3:
+	Fixed the Makefile so recent versions of gcc no longer choke.
+	The -N option appears to have been broken since 6.6.0.  Fixed.
+

@@ -1,0 +1,81 @@
+.TH NNTIDY 1 "Release 6.6"
+.\" (c) Copyright 1988, 1990, Kim F. Storm.  All rights reserved.
+.UC 4
+.SH NAME
+nntidy \- tidy your personal .newsrc file
+.SH SYNOPSIS
+.B nntidy
+[ \-\fBaciNQrsuv\fP ]  [ group ]...
+.SH DESCRIPTION
+.B nntidy
+will clean out non-existing groups, adjust obviously wrong article
+numbers, and remove badly formed lines from your .newsrc file.
+.LP
+It may optionally remove ignored groups, unsubscribed groups, and
+groups which are not part of your presentation sequence or the groups
+specified on the command line.
+.LP
+You should run
+.B nntidy
+if your rc file has been corrupted for some reason.
+.SH OPTIONS
+.TP
+.B \-a
+Equivalent to
+.B \-cisu.
+.TP
+.B \-c
+Remove unrecognized lines.  This will also remove the `options' line
+used by some older news readers, such as
+.BR readnews (1)
+.TP
+.B \-i
+Remove entries for groups which are ignored in the database, e.g.
+entries marked with `X' in the GROUPS file.
+.TP
+.B \-r
+Remove entries for unsubscribed groups.
+.TP
+.B \-s
+Remove entries which are not included in the group presentation
+sequence defined in the init file.  If one or more groups are
+specified on the command line, entries not matched by these groups
+(and their subgroups etc) will be removed.
+.sp 0.5v
+Notice that depending on how you construct the presentation sequence,
+this may cause unsubscribed groups to be removed from .newsrc, but
+this will not normally happen.
+.TP
+.B \-u
+Truncate entries for unsubscribed groups, by removing the article
+numbers and leaving only the news group name and the `!' mark.
+.TP
+.B \-v
+Verbose operation.  Reports each change made to the .newsrc file.
+.TP
+.B \-N
+No update mode.  The requested operations are performed, but the
+result is not written back to disk.  This can be used with the
+.B \-v
+option to see whether tidying is required.
+.TP
+.B \-Q
+Quiet operation.  The version information is not printed.
+.SH FILES
+.DT
+.ta \w'~/.newsrc.tidy'u+3m
+.\"ta 0 20
+~/.newsrc	The record of read articles
+.br
+~/.newsrc.tidy	The original rc file before tidy
+.DT
+.SH SEE ALSO
+nn(1), nncheck(1), nngoback(1), nngrab(1), nngrep(1), nnpost(1)
+.br
+nnadmin(1M), nnusage(1M), nnmaster(8)
+.SH AUTHOR
+Kim F. Storm, Texas Instruments A/S, Denmark
+.br
+E-mail: storm@texas.dk
+
+

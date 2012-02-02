@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# nn_elm
+#
+# 07 Aug 91             V1.0
+#
+# Massage a mail message from nn into a form that elm can use
+# (c) 1991 Phil Kernick  Wizard Software
+#
+#  
+#  Add the following to ~/.nn/init:
+#  
+#	set   mailer              nn_elm
+#	unset mailer-pipe-input
+#  
+#  Here is nn_elm:
+
+eval `awk '
+BEGIN {
+  FS = ":";
+  dq = sprintf("%c", 34);
+  
+  headers = 0;
+  to = "";
+  subject = "";
+}
+  
+/^.*: / {
+  headers++;
+  if($1 == "To")
+    to = dq substr($0, 5) dq;
+  if($1 == "Subject")
+    subject = dq substr($0, 10) dq;
+}
+  
+/^$/ {
+    printf("tail +%d %s | elm -s %s %s > /dev/null\n", headers+2, mail, subject, to);
+    exit;
+}' mail=$1 $1`
+  
+exit $?

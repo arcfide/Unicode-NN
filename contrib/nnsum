@@ -1,0 +1,57 @@
+#! /bin/sh
+# Copyright (C) 1992,1993 Bernd Felsche,
+# Metapro Systems & DIALix Services ; Perth, Western Australia
+# All rights reserved
+#
+# This software is freely distributable as part of the "nn"
+# newsreader package as long as this Copyright notice remains
+# intact.
+#
+# Run by news periodically, to update the newsrc file
+# and to report the number of articles received since
+# the last datum point.
+#
+# e.g. crontab:
+# 29,59 *	* * *	/usr/local/lib/nn/nnsum report
+# 01 00		* * *	/usr/local/lib/nn/nnsum zero
+#
+# /etc/profile can then do something like:
+#	/usr/lib/news/nnsum
+# to display the number of new news articles when users login.
+#
+# The report to users looks something like this:
+# metapro has received 24332 articles in 928 groups today.
+#
+# UTSL.
+
+# Configure the following to fit your news and nn installation.
+PATH=/bin:/usr/bin:/usr/local/bin
+HOME=/usr/lib/news
+MAIL=/usr/mail/news
+NEWSRC=$HOME/.newsrc
+ACTIVE=$HOME/active
+TERM=dumb
+export PATH TERM MAIL HOME
+
+REPORT=/usr/lib/news/NEWARTS
+
+cd $HOME
+
+case "$1" in
+report)
+	SYSTEM=`uuname -l`
+	NEWAGE=`find $NEWSRC -mtime -1 -print 2>/dev/null`
+	[ "$NEWAGE" = "$NEWSRC" ] && DAY=today || DAY=recently
+	echo \
+	`nncheck -f "$SYSTEM has received %U net news articles in %g $DAY"` \
+	> $REPORT
+	;;
+zero)
+	sed 's+^\([^ ]*\) 0*\([0-9][0-9]*\) .*$+\1: 1-\2+' $ACTIVE > $NEWSRC
+	;;
+*)
+	[ -f $REPORT -a -r $REPORT ] && cat $REPORT
+	;;
+esac
+
+exit 0

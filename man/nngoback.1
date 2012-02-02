@@ -1,0 +1,104 @@
+.TH NNGOBACK 1 "Release 6.6"
+.\" (c) Copyright 1988, 1990, Kim F. Storm.  All rights reserved.
+.UC 4
+.SH NAME
+nngoback \- make news articles unread on a day-by-day basis (nn)
+.SH SYNOPSIS
+.B nngoback
+[ \-\fBNQvi\fP ]
+[\-\fBd\fP] \fIdays\fP
+[ \fIgroup\fP ]...
+.SH DESCRIPTION
+.I nngoback
+will rewind the .newsrc record file of \fBnn\fP(1) one or more \fIdays\fP.
+It can be used to rewind all groups, or only a specified set of
+\fIgroups\fP.
+In other words, \fInngoback\fP can mark news articles which have
+arrived on the system during the last \fIdays\fP days unread.
+.LP
+Only \fIsubscribed\fP groups that occur in the current presentation
+sequence are rewound.  That means that if no \fIgroup\fP arguments are
+specified, all groups occurring in the sequence defined in the
+\fIinit\fP file will be rewound.  Otherwise, only the groups specified
+on the argument line will be rewound.
+.LP
+When a group is rewound, the information about selections, partially
+read digests etc. are discarded.  It will print notifications about
+this unless the \-\fBQ\fP (quiet) option is used.
+.LP
+If the \-\fBi\fP (interactive) option is specified, \fInngoback\fP
+will report for each how many articles \fIcan be\fP marked unread, and
+ask for confirmation before going back in that group.
+.LP
+If the \-\fBv\fP (verbose) option is specified, \fInngoback\fP will
+report how many articles are marked unread.
+.LP
+If the \-\fBN\fP (no-update) option is specified, \fInngoback\fP will
+perform the entire goback operation, but not update the .newsrc file.
+.LP
+If you are not up-to-date with your news reading, you can also use
+\fBnngoback\fP to catch up to only have the last few days of news
+waiting to be read in the following way:
+.br
+	nn \-a0
+.br
+	nngoback 3
+.br
+The \fBnn\fP command will mark all articles in all groups as read (answer
+.I all
+to the catch-up question.)  The following \fBnngoback\fP will then make
+the last three days of news unread again.
+.LP
+Examples:
+.TP
+nngoback 0
+Mark the articles which have arrived today as unread.
+.TP
+nngoback 1
+Mark the articles which have arrived yesterday and today as unread.
+.TP
+nngoback 6
+Mark the articles which have arrived during the last week as unread.
+.LP
+You cannot go more than 14 days back with \fInngoback\fP.
+(You can change this limit as described below.)
+.SH THE BACK_ACT DAEMON
+It is a prerequisite for the use of \fInngoback\fP that the script
+\fBback_act\fP is executed at an appropriate time once (and only once)
+every day.  Preferably this is done by \fBcron\fP right before the
+bacth of news for `today' is received.  \fBback_act\fP will maintain
+copies of the active file for the last 14 days.
+.LP
+Optionally, the \fBback_act\fP program accepts a single numerical
+argument specifying how many copies of the active file it should
+maintain.  This is useful if news is expired after 7 days, in which
+case keeping more than 7 days of active file copies is wasteful.
+.SH FILES
+.DT
+.ta \w'~/.newsrc.goback'u+5m
+.\"ta 0 21
+~/.newsrc	The record of read articles.
+.br
+~/.newsrc.goback	The original rc file before goback.
+.br
+$db/active.\fIN\fP	The \fIN\fP days `old' active file.
+.br
+$master/back_act	Script run by cron to maintain old active files.
+.br
+.DT
+.SH SEE ALSO
+nn(1), nncheck(1), nngrab(1), nngrep(1), nnpost(1), nntidy(1)
+.br
+nnadmin(1M), nnusage(1M), nnmaster(8)
+.SH NOTES
+\fBnngoback\fP does not check the age of the `old' active files; it
+will blindly believe that active.0 was created today, and that
+active.7 is really seven days old!  Therefore, the \fIback_act\fP
+script should be run once and only once every day for \fInngoback\fP
+to work properly.
+.LP
+The days are counted relative to the time the active files were copied.
+.SH AUTHOR
+Kim F. Storm, Texas Instruments A/S, Denmark
+.br
+E-mail: storm@texas.dk

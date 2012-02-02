@@ -1,0 +1,111 @@
+.TH NNACCT 1m "Release 6.6"
+.UC 4
+.SH NAME
+nnacct \- news accounting and access authorization (nn)
+.SH SYNOPSIS
+\fBnnacct\fP \-\fBr\fP [ \-\fBf\fP file ] [ \-\fBa\fP ] [ user ]...
+.br
+\fBnnacct\fP [ \-\fBp\fP\fIpolicy\fP ] [ \-\fBq\fP\fIquota\fP ] user...
+.br
+\fBnnacct\fP \-\fBZERO\fP
+.SH DESCRIPTION
+The \fInnacct\fP command provides an optional accounting and access
+authorization for news reading via the \fInn\fP news reader.
+.LP
+The first form (\-\fBr\fP) is used to print accounting reports.
+If a \fIfile\fP is specified data from a saved accounting file;
+otherwise the data is read from the current accounting file.
+.LP
+If \-\fBa\fP is specified, the report will contain accounting data for
+\fIall\fP users.  Otherwise, if one or more \fIusers\fP are specified,
+the data for these users will be printed.  If neiter is specified,
+only the accounting data for the current user is printed.
+  Only the super-user can generate reports for other users than the
+caller.
+.LP
+The second form (\-\fBp\fP and/or \-\fBq\fP) assigns the specified
+access \fIpolicy\fP and/or \fIquota\fP to the specified users.  If a
+given user is not already known in the accounting file, a new entry
+with the specified policy and quota is created (default values are
+used if both are not specified).
+.LP
+The third form (\-\fBZERO\fP) will clear the usage counts for
+\fIall\fP users.
+Individual usage counts cannot be cleared.
+The original accounting file is saved with a .old suffix.
+.LP
+The following policies are currently implemented:
+.TP
+\fB0\fP
+No access.  The user is not allowed to read news at all.
+.TP
+\fB1\fP
+Privileged user.  The user can read news at all times and no
+accounting information is saved.  This is obviously the policy for
+system administrators :-)
+.TP
+\fB2\fP
+Full time access.  The user can access news at all times.
+.TP
+\fB3\fP
+Off-hours access.  The user can only access news at off hours, i.e. in
+the morning, in the evening, on week-ends, and on holidays (not
+complete \- check the source :-)
+.LP
+The \fIquota\fP specifies a number of \fIhours\fP which the user is
+allowed to read news.  When this quota is used up, access will be
+blocked.  A quota of zero gives unlimited access.
+.LP
+New users will get the \fIdefault policy\fP and \fIquota\fP defined in
+account.c.  If this allows new users to read news at only specific
+times, this form can be used to permit individual users to read news
+at all times, or it can be used to prevent them from reading news at
+all.  If the default policy does not allow new users to read news,
+this form must be used to authorize them to read news.
+.SH HOW IT WORKS
+If authorization is enabled, the \fInn\fP news reader will call
+\fInnacct\fP on start-up to check whether the policy and quota defined
+for the current user allows him to read news at this time (or at all).
+.LP
+If accounting is enabled, the \fInn\fP news reader will call
+\fInnacct\fP on exit to register the time spent on news reading.
+If account logging is also defined (see account.c), an line is also
+added to the accounting log file.
+.LP
+When accounting is defined, the user can use the \fB:cost\fP command
+to get the current accounting data, and if the variable
+\fBreport-cost\fP is set, \fInn\fP will print accounting information
+on exit.
+.SH CONTIGURATION AND NEW POLICIES
+The use of \fInnacct\fP is enabled via the ACCOUNTING and
+AUTHORIZE symbols in \fInn\fP's configuration file.  Further
+configuration of cost calculations, logging, default policy, default
+quotas, etc. is done directly in the source file \fIaccount.c\fP.  New
+access policies can also be defined in this file.  This allows you to
+change the policies or prices without having to recompile the whole
+package since only \fInnacct\fP is modified.
+.SH PRIVILEGED USERS
+Normally, only root is allowed to change user policy or quota, list
+all user's accounting data etc.  This privilege can be shared with
+other users by listing their login name in the file $CLIENT/admins.
+There should be exactly one login name per line, and no blanks are
+allowed.
+.SH FILES
+.DT
+.ta \w'$db/acctlog'u+3m
+.\"ta 0 16
+$db/acct	accounting data (accumulated per user)
+.br
+$db/acctlog	accounting log (grows indefinitely)
+.br
+$lib/admins	login names of privileged \fInnacct\fP users.
+.DT
+.SH SEE ALSO
+nn(1), nnusage(1)
+.SH BUGS
+There should be some tools to mess around with the accounting files,
+e.g. to make summaries, clear usage counters, etc.
+.SH AUTHOR
+Kim F. Storm, Texas Instruments A/S, Denmark
+.br
+E-mail: storm@texas.dk

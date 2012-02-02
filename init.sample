@@ -1,0 +1,114 @@
+######################### GLOBAL INIT FILE ##################
+#
+#	Examine this sample init file before installing it
+#	It may set variables or define a presentation sequence
+#	which is inadequate for you.
+
+
+############################ VARIABLES ##########################
+#
+#	These are some of the variables you may want to set-up globally.
+#	Check with the manual to see if you really need them!
+
+# set bug-report-address mtpins@nndev.org
+set default-distribution local
+set follow-distribution same
+set default-save-file +$G
+set header-lines _FODn=S
+set include-art-id
+set mail-format
+# set mark-overlap
+set save-counter .%02d
+
+# set this if you use NFS (and specify -y2 on nnmaster as well):
+# set retry-on-error 2
+
+# Some other interesting features. Check in the manual.
+# set consolidated-menu
+# set consolidated-manual
+# set subject-match-offset 8
+# set subject-match-parts
+# set header-lines _FGD=S
+# set new-group-action 4
+# set news-record ~/.nn/NEWS-POST
+# set mail-record ~/.nn/NEWS-POST
+# set mailer /usr/bin/nn_elm
+# unset mailer-pipe-input
+# set charset iso-8859-1
+# set auto-select-rw
+# set ignore-re
+
+################# DEFAULT PRESENTATION SEQUENCE ####################
+#
+#	Adapt this to your local preferences.
+#	Users can override this sequence in their own init file.
+#
+#	**** THIS IS JUST AN EXAMPLE TO SHOW THE POSSIBILITIES	****
+#	**** IT IS DEFINITELY NOT WHAT YOU WANT TO HAVE HERE	****
+#	**** IF YOU DON'T KNOW WHAT TO PUT HERE, YOU ARE BETTER	****
+#	**** OFF JUST DELETING THE REST OF THIS FILE !!!!!	****
+
+sequence
+
+	# groups everybody should read first (local groups)
+< texas*
+< general
+
+	# If you include the following !! line, users without their own
+	# init file will only get the local groups specified above!
+	#
+	# Other users will have to include a @ in their private presentation
+	# sequence to disable the '!!' operator entirely, or they can
+	# include the (few) groups they want to see.
+# !!
+
+	# also put local test first -- if users want to experiment, they want
+	# to see the results immediately.
+< test
+
+	# ignore some groups for ordinary users; anybody can get these
+	# by including them in their own init file.
+
+	# ignore non-local test groups
+! .test
+	# ignore offensive groups
+! alt.sex*
+! .bizarre
+! rec.humor
+
+	# the default sequence for the other groups
+	# subgroups are presented in alphabetical order
+
+	# danish/scandinavian groups
+dk.
+nordunet.
+
+
+	# european groups
+	# read eunet.general before eunet.followup and other eunet groups
+eunet.general
+eunet.followup
+eunet.
+
+	# new groups are presented here
+	# use ! NEW to ignore new groups entirely!
+NEW
+
+	# world groups - prefer technical groups to other groups.
+news.
+comp.
+sci.
+gnu.
+bionet.
+alt.
+rec.
+misc.
+talk.
+
+	# delay junk (we then only see non-cross postings.)
+> junk
+
+# groups that are not mentioned above will be shown here in alphabetical
+# order
+
+

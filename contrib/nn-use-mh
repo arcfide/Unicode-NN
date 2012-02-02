@@ -1,0 +1,34 @@
+The original idea of using MH (namely, comp) to send mail from nn
+came from Jaap Vermeulen, but he wouldn't recognize what I did to
+it.  I also used a suggestion from John Romine and Tom McCain.
+
+Add
+
+	set mail-script nn-use-mh
+
+to your init file, where nn-use-mh is the following:
+
+#!/bin/sh
+
+# Obtain value of $WORK and $RECORD
+. ${HOME}/.nn/.param
+
+# Append Fcc: +folder to headers.  The folder is specified in
+# mail-record.
+if [ "$RECORD" != "" ]; then
+	awk '
+	{
+		if ($0 == "" && !done) {
+			print "Fcc: +'$RECORD'";
+			done = 1;
+		}
+		print;
+	}' $WORK > /tmp/aux.$$ && mv /tmp/aux.$$ $WORK
+fi
+
+# Compose and send the mail
+comp -form $WORK
+
+In addition, you can contact Ray Davis <rdavis@convex.com> for some
+scripts that sort of turn nn into a MH front end by providing macros
+to save, delete and refile articles in MH folders.

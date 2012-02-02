@@ -1,0 +1,56 @@
+
+Read INSTALLATION for instructions on configuring/compiling/installing nn.
+
+
+Major differences from nn-6.6.5:
+
+The name length displayed is now based upon the width of the screen.
+
+nn will now correctly parse From: lines that contain ()
+        For example:
+            From: "Jesse James (home)" <jjames@example.com>
+        used to display as "home", the new behavior will display
+        it as "Jesse James".  However, this may affect killfiles
+        that depend upon the old behavior.
+        To use the old behavior, set the new run-time variable
+        'old-packname' to true.
+
+Header check macro is now case insensitive for both news and folders.
+
+Added GPG support, which comes with a new run-time variable 'sign-type', and
+a compile-time variable SIGN_TYPE to set the default to either pgp or gpg.
+
+nn will now look in /etc/resolv.conf for a domain if DOMAIN isn't defined
+and hostname isn't a FQDN.
+
+new command ":show config" will show the compile-time definitions.
+
+nntp-user and nntp-password are now be settable in the init file.  Note
+that this may have serious security ramifications if the nntp-password and
+the users password are identical.
+
+
+DISTRIBUTION:
+
+The current version of nn is available via anonymous ftp from
+ftp.nndev.org
+
+
+BUG REPORTS and SUGGESTIONS:
+
+Please send bug reports (and fixes) to the following address:
+        nn-bugs@nndev.org
+
+You may also use nn-bugs for suggestions for improvements.
+
+The easiest way to send a bug report is by using the :bug command in nn.
+
+
+NN HAS ITS OWN NEWS GROUP:
+
+There is an unmoderated news group dedicated to nn: news.software.nn
+
+The news.software.nn group is used for discussion on all subjects related
+to the nn news reader.  This includes, but is not limited to, questions,
+answers, ideas, hints, information from the developer, patches, etc.
+

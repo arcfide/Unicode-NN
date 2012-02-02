@@ -1,0 +1,49 @@
+.TH NNSTATS 1M "Release 6.6"
+.\" (c) Copyright 1988, 1990, Kim F. Storm.  All rights reserved.
+.UC 4
+.SH NAME
+nnstats \- display \fInnmaster\fP collection and expire statistics
+.SH SYNOPSIS
+.B nnstats
+[ \-\fBlt\fP ]
+[ \-\fBd\fP \fImonth\fP \fIday\fP ]
+[ \-\fBm\fP \fImonth\fP ]
+[ \fIlogfile\fP ]...
+.SH DESCRIPTION
+.I nnstats
+will extract the collection (C) and expiration (X) entries from the
+log file and calculate total and average number of articles, groups
+and elapsed time per day, per month, or for the duration of the whole
+log file.
+.LP
+Normally only a summary for the specified period is printed.  If
+\-\fBl\fP is specified, the statistics for each day in the period is
+also printed, and if \-\fBt\fP is specified the summary is not
+printed.
+.LP
+Normally the statistics is collected for all days in the log files (or
+the current log file if one is not specified).
+.LP
+If "\-\fBm\fP \fImonth\fP" is specified, the statistics for that month
+is calculated.  The \fImonth\fP is specified in normal \fIdate\fP
+notation, i.e. a capitalized three letter abbreviation like Jan, Feb, ...
+.LP
+If "\-\fBd\fP \fImonth\fP \fIday\fP" is specified, the statistics for
+that date only is calculated and printed.
+.SH FILES
+.DT
+.ta \w'.../Log'u+3m
+.\"ta 0 20
+.../Log	The log file
+.DT
+.SH SEE ALSO
+nn(1), nnusage(1M), nnadmin(1M), nnmaster(8)
+.SH NOTES
+If \fInnmaster\fP is run with options \-\fBL\fPCX, \fInnstats\fP will
+not work, because the necessary entries are not written to the log file.
+.SH AUTHORS
+Mark Moraes <moraes@csri.toronto.edu>
+.br
+Kim F. Storm <storm@texas.dk>
+
+

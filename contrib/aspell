@@ -1,0 +1,81 @@
+From: davison@drivax.uucp (Wayne Davison)
+Date: Thu, 19 Apr 90 13:47:07 PST
+To: storm@texas.dk
+Subject: Our spelling checker installation
+
+ *  An advanced front-end to ispell written in perl!
+ *  Your shell/kernel must handle the #! control.
+ *  Also look over the script if your ispell and perl is not in
+ *  /usr/local/bin.
+ *
+ *  To use this code, you will need to put it somewhere suitable and
+ *  set the variable 'spell-checker' to the full path of this program,
+ *  e.g.
+ *	set spell-checker /usr/local/bin/aspell
+ *
+ *  ++Kim
+
+
+I also created a perl script to disect the article before sending it to the
+spelling checker -- it separates the header and the signature from the body,
+PLUS it includes the Subject, Keywords, and Summmary lines in the article to
+be checked.  After the checking is complete, it removes the .bak file, and
+reconstructs the article using the various pieces.
+
+The source for aspell follow.
+
+ \  /| / /|\/ /| /(_)		<--flip monitor over for neato effect!
+(_)/ |/ /\|/ / |/  \
+   (W    A Y   N   e)
+
+----8<------8<------8<------8<-----cut here----->8------>8------>8------>8----
+#! /usr/local/bin/perl
+if ($#ARGV != $[) {
+	print "Usage: aspell filename\n";
+	exit 1;
+}
+$FILE = shift;				# get filename of file to check
+$BODY = "/tmp/aspell$$";
+open(FILE,$FILE);			# open file for input
+open(BODY,">$BODY");			# open output file that we'll check
+while (<FILE>) {				# read a line
+	last unless /^([ \t]|[^ \t]*:)(.*)/;	# quit at end of header
+	$header[$#header+1] = $_;		# save header in array
+	sw1: {				# write certain headers to output file
+		/^Subject:(.*)/  && do {print BODY; last sw1;};
+		/^Keywords:(.*)/ && do {print BODY; last sw1;};
+		/^Summary:(.*)/  && do {print BODY; last sw1;};
+	}
+}
+print BODY;				# write blank line to output file
+while (<FILE>) {			# keep reading if not @ EOF
+	last if /^-- $/;		# quit if we find the signature
+	print BODY;			# write line to output file
+}
+do {
+	$sig[$#sig+1] = $_;		# save signature in array (if there)
+} while (<FILE>);			# until EOF
+close(BODY);
+close(FILE);
+
+system "/usr/local/bin/ispell", "$BODY";	# run ispell
+unlink "${BODY}.bak";				# rm .bak file
+
+open(FILE,">$FILE");			# open original file for output
+open(BODY,$BODY);			# open body of article for input
+for ($i = 0; $i <= $#header; $i++) {
+	$_ = $header[$i];		# grab a header line
+	sw2: {				# substitute spelling-checked versions
+		/^Subject:(.*)/  && ($_ = <BODY>, last sw2);
+		/^Keywords:(.*)/ && ($_ = <BODY>, last sw2);
+		/^Summary:(.*)/  && ($_ = <BODY>, last sw2);
+	}
+	print FILE;			# re-write header
+}
+while(<BODY>) {
+	print FILE;			# re-write body
+}
+for ($i = 0; $i <= $#sig; $i++) {
+	print FILE $sig[$i];		# re-write signature (if present)
+}
+unlink "$BODY";				# clean up

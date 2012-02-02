@@ -1,0 +1,97 @@
+.TH NNGREP 1 "Release 6.6"
+.\" (c) Copyright 1988, 1990, Kim F. Storm.  All rights reserved.
+.UC 4
+.SH NAME
+nngrep \- grep for news group names (nn)
+.SH SYNOPSIS
+.B nngrep
+[ \-\fBainprsu\fP ]
+[ \-\fBl\fP ]
+[ \fIpattern\fP ]
+.SH DESCRIPTION
+\fInngrep\fP can print various selections of the available news
+groups.
+.LP
+Without options, \fInngrep\fP will list all currently \fIsubscribed\fP
+newsgroups whose name matches any of the specified \fIpatterns\fP.  If
+no pattern is specified, all subscribed groups will be listed.
+.LP
+The selection of news groups against which the patterns are matches,
+and subsequently printed by \fInngrep\fP can be limited or
+expanded using the following command line options and arguments:
+.TP
+\fB\-a\fP
+Use \fIboth\fP subscribed and unsubscribed groups.  Overrides the
+\fB\-u\fP option.
+.TP
+\fB\-i\fP
+Use only \fIignored\fP groups, i.e. which are \fInot\fP in the
+presentation sequence.
+.TP
+\fB\-n\fP
+Use only \fInew\fP groups.  Notice that \fInn\fP considers a group to
+be new until you have read at least one article in the group, or you
+have unsubscribed to the group.  This means that even reasonable
+active news groups may remain "new" for quite some time if it only
+contains articles which are cross-posted to other groups which occur
+earlier in your presentation sequence.
+.TP
+\fB\-p\fP
+Use only groups with \fIunread\fP (pending) articles.
+.TP
+\fB\-r\fP
+Use only \fIread\fP groups, i.e. without unread articles.
+.TP
+\fB\-s\fP
+Use only groups which are in the presentation \fIsequence\fP.
+.TP
+\fB\-u\fP
+Use only \fIunsubscribed\fP groups.
+.LP
+These options can be combined if they don't logically exclude each
+other.
+.LP
+For example, to get the names of all "source" groups, you can use the
+command
+.br
+	nngrep source
+.LP
+You can use this to read a specific subset of news groups with
+\fInn\fP; for example
+.br
+	nn `nngrep -sp source`
+.SH LONG LISTING
+A \fIlong\fP listing of the matched groups can be requested with the
+\fB\-l\fP option.  It will include the following information:
+.LP
+.DT
+.ta \w'SEQUENCE'u+3m
+.\"ta 0 12
+SUBSCR	Specifies whether the group is subscribed or not (yes/no).
+.br
+NEW	Specifies whether the group is new or not (yes/no).
+.br
+UNREAD	Shows the number of unread articles in the group (if any).
+.br
+SEQUENCE	Shows the group's index in the presentation sequence.
+.br
+GROUP	The name of the group.
+.br
+.DT
+.SH FILES
+.DT
+.ta \w'~/.nn/init'u+3m
+.\"ta 0 12
+~/.newsrc	The record of read articles
+.br
+~/.nn/init	The presentation sequence
+.DT
+.SH SEE ALSO
+nn(1), nncheck(1), nngoback(1), nngrab(1), nnpost(1), nntidy(1)
+.br
+nnadmin(1M), nnusage(1M), nnmaster(8)
+.SH AUTHOR
+Kim F. Storm, Texas Instruments A/S, Denmark
+.br
+E-mail: storm@texas.dk
+

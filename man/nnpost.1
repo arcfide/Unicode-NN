@@ -1,0 +1,77 @@
+.TH NNPOST 1 "Release 6.6"
+.UC 4
+.SH NAME
+nnpost \- post news articles (\fInn\fP)
+.SH SYNOPSIS
+.B nnpost
+[ \-\fBdksy\fP \fIstring\fP ]
+[ \-\fBf\fP \fIfile\fP ]
+[ \-\fBp\fP ]
+[ \fIgroup\fP... ]
+.SH DESCRIPTION
+.B nnpost
+is used to post new articles using \fInn\fP's normal interface, but
+without entering \fInn\fP in reading mode.
+.LP
+When started, it reads the \fIinit\fP file and then directly executes
+\fInn\fP's \fB:post\fP command.
+.LP
+It will prompt for a (comma-separated) list of news groups, the
+article subject, a list of keywords, a summary, and the distribution
+of the article.  Each of these prompts can also be supplied via
+command line options or arguments as described below.
+.LP
+When prompted for the "Newsgroup:", entering a \fB?\fP as the first
+key will cause \fInnpost\fP to list all the known news groups and
+their purpose (if this information is available).  You can also enter
+\fB/\fP followed by a word or regular expression which will cause
+\fInnpost\fP to produce a (much) shorter listing only containing the
+groups whose name and/or purpose description matches the regular
+expression.  When paging through either list, you can enter \fBq\fP to
+quit the listing.
+.LP
+If a source file is specified with \fB\-f\fP it will be used as the
+initial article body.  If the \fB\-p\fP option is also specified, the
+article is posted directly without editing.
+.LP
+\fInnpost\fP can be used to do unattended postings if sufficient
+arguments are provided on the command line to build the header and the
+body of the article.  The required arguments are: one or more
+newsgroups, a subject (\fB\-s\fP), a source file (\fB\-f\fP), a
+distribution (\fB\-d\fP), and the \fB\-p\fP option.  Other fields
+which are not specified (e.g. keywords) will not be included in the
+header.  The contents of the \fInews-header\fP variable in the
+init file will be included in the header.
+.SH OPTIONS
+.TP
+\fB\-d\fP \fIdistribution\fP
+Use the specified \fIdistribution\fP for the article.
+.TP
+\fB\-k\fP "\fIkeywords\fP"
+Associate the specified \fIkeywords\fP with the article.
+.sp 0.5v
+.TP
+\fB\-s\fP "\fIsubject\fP"
+Use the specified \fIsubject\fP for the new article.
+.TP
+\fB\-y\fP "\fIsummary\fP"
+Include the given \fIsummary\fP in the article header.
+.TP
+\fB\-f\fP \fIfile\fP
+Read the article \fIbody\fP from the specified file.
+.TP
+\fB\-p\fP
+Post the article specified with \fB\-f\fP without editing.
+.SH FILES
+.DT
+.ta \w'~/.nn/init'u+3m
+.\"ta 0 12
+~/.nn/init	The control variables for \fInnpost\fP.
+.DT
+.SH SEE ALSO
+nn(1)
+.SH AUTHOR
+Kim F. Storm, Texas Instruments A/S, Denmark
+.br
+E-mail: storm@texas.dk
+

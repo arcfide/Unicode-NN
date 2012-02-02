@@ -1,0 +1,72 @@
+#!/bin/sh
+#
+# nn-expand-mail-alias -- expands aliases from ~/.mailrc file for nn.
+#
+# To use, put the following in your ~/.nn/init file:
+#
+#	set mail-alias-expander nn-expand-mail-alias
+# and put this file somewhere in your path, making it executable.  I use
+#	set mail-alias-expander /usr/local/lib/nn-expand-mail-alias
+# but the choice is up to you.
+#
+# Written by Scott Hannahs, Bitter National Magnet Lab, MIT, August 1991
+# Complaints, comments, ideas to sth@slipknot.mit.edu
+# Tested on Silicon Graphics, IRIX 3.3.1
+#
+# Minor banging by <rreiner@nexus.yorku.ca> to handle alias value fields
+# which contain doublequote characters, e.g.
+#
+#	alias Foo "Foobar the Great <foo@bar.com>"
+#
+# (the doublequotes are stripped in the expansion), and to handle multiple
+# spaces after the token "alias".
+#
+# Also added some error detection and signal traps; tested on SunOS 4.1.1.
+#
+#	Exit codes: 	0 -- normal termination
+#			1 -- parm error
+#			2 -- file does not exist
+#			3 -- trap
+#
+# Thanks to bug reports from
+#  Andy Jacobs and others
+#
+if [ z$1 = z ]; then
+  myname=`basename $0`
+  echo "$myname: usage is  $myname workfile"
+  exit 1
+fi
+
+if [ ! -f $1 ]; then
+  myname=`basename $0`
+  echo "$myname: $1 does not exist or is a directory"
+  exit 2
+fi
+
+TMP_DIR=/usr/tmp
+
+trap "rm -f ${TMP_DIR}/nn.alias.$$ ; exit 3" 0 1 2 3 15
+
+ALIAS_LIST=""
+ADDRESS_LIST="`head -1 $1 | sed -e s/To://`"
+until [ "$ALIAS_LIST" = "$ADDRESS_LIST" ] ; do
+  ALIAS_LIST="`echo "$ADDRESS_LIST"| sed -e 's/,/ /g' `"
+  ADDRESS_LIST=""
+    for ALIAS in $ALIAS_LIST ; do
+	ADDRESS=`grep '^[ 	]*alias[ 	][ 	]*'"$ALIAS"'[ 	]' ${HOME}/.mailrc |\
+	sed      -e s/'^[ 	]*alias[ 	][ 	]*'"$ALIAS"'[ 	][ 	]*'// |\
+	sed -e s/'"'//g`
+	if [ "$ADDRESS" ] ; then
+	  ADDRESS_LIST="$ADDRESS_LIST $ADDRESS"
+	else
+	  ADDRESS_LIST="$ADDRESS_LIST $ALIAS"
+#      for elm alias expansion use the following line instead of the previous.
+#      ADDRESS_LIST="$ADDRESS_LIST "`elm -c "$ALIAS" | cut -f3 -d\ `
+	fi
+    done
+  done
+echo "To:${ADDRESS_LIST}" > ${TMP_DIR}/nn.alias.$$
+tail +2 $1 >> ${TMP_DIR}/nn.alias.$$
+mv -f ${TMP_DIR}/nn.alias.$$ $1
+
+exit 0

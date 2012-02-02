@@ -1,0 +1,639 @@
+		 CONFIGURATION AND INSTALLATION OF NN
+		 ------------------------------------
+
+			     RELEASE 6.7
+
+
+This file describes the necessary steps to configure and install nn.
+You are advised to read this file before proceeding with the installation.
+
+If you've configured/installed nn before, you can probably ignore this file
+and proceed to editing config.h.  Note that there are new variables in
+config.h, so copying one from nn-6.6 won't work.  (Though it can obviously
+be used as a guide).
+
+The following command line prompts are used in the examples:
+   `$' is used when no special privileges are required.
+   `#' is used when SUPER USER privileges may be required.
+
+Note that this file still assumes in many places that you will be running
+nnmaster.  If you are using NOV instead, you should ignore anything dealing
+with nnmaster and its database.  If you are only installing the nn client,
+you can also ignore steps 3.5, 6, and 7.
+
+
+				STEP 1
+
+		      CONFIGURATION OF MAKEFILE
+		      -------------------------
+
+Check the 'Makefile' file and supply the proper values for the
+following parameters:
+
+CC	The command to invoke the C compiler
+
+CPP	The command to invoke the C preprocessor with the result
+	written to the standard output stream.
+
+CFLAGS	Flags to the C compiler  (e.g. -O or -g)
+
+LDFLAGS	Additional flags to the C compiler when linking executables
+
+Notice that mandatory system specific CFLAGS and LDFLAGS are usually
+defined in the s- file (see below).
+
+
+				STEP 2
+
+		  CREATE CONFIGURATION FILE config.h
+		  ----------------------------------
+
+The configuration file is distributed in the file config.h-dist.  You
+must COPY this to config.h before proceeding.  Keep the original -dist
+file to allow patches to be applied to it if necessary.
+
+	$ cp config.h-dist config.h
+
+
+				STEP 3
+
+		 EDIT config.h TO REFLECT YOUR SYSTEM
+		 ------------------------------------
+
+For each required configuration parameter, the config.h file contains
+verbose comments explaining the meaning of each parameter in the file.
+Read and follow these instructions carefully.  If you do that, nn
+should compile and run without problems.
+
+Further information about the parameters can be found below in case
+you are in doubt.  Regarding the NNTP related definitions, consult the
+file named olddoc/NNTP.  Note that the information there is out of date.
+
+Notice that every time you edit config.h, the file update.h is
+modified to make a new configuration level for the version in the
+source directory.  The current configuration is showed in the version
+string as #number.
+
+
+	   STEP 3.1: SPECIFY NOV AND NNTP CONFIGURATION
+	   ------------------------------------------------
+
+If you will be connecting to a newsserver that uses NOV (and nearly all of
+them do these days), define NOV.
+
+If you use nn on a single system with news on its local disks, you
+will not have to worry the least about networking, and you simply
+leave NNTP undefined.
+
+
+		     STEP 3.2: SELECT SYSTEM FILE
+		     ----------------------------
+
+A list of systems that nn runs on and their associated include files
+is found in the file MACHINES.
+
+If none of these can be used on your system, create your own based on
+the file conf/s-template.h.
+
+
+		    STEP 3.3: SELECT MACHINE FILE
+		    -----------------------------
+
+A list of machines that nn runs on and their associated include files
+is found in the file MACHINES.
+
+If you cannot use one of these machine files create your own based on
+the file conf/m-template.h.
+
+
+			STEP 3.4: LOCALIZE NN
+			---------------------
+
+You will have to specify a number of files and directories which nn
+has to know about to work properly.  If you don't specify these, nn
+will in most cases use it own alternatives which will correspond to
+common practices on most installations.
+
+The following directories and files can be defined in config.h:
+
+
+BIN_DIRECTORY		(mandatory)
+
+	The directory where you want the user programs to be
+	installed.  The following programs will be installed in that
+	directory:
+
+	nn		The news reader program
+	nnacct		Accounting, quota, and access management
+	nnadmin		The administration program (link to nn)
+	nncheck		Check for unread articles (link to nn)
+	nngoback	Mark older articles as unread (link to nn)
+	nngrab		Faster keyword search
+	nngrep		Grep for news groups (link to nn)
+	nnpost		Standalone posting program (link to nn).
+	nnstats		Collection and expiration statistics
+	nntidy		Cleans up the rc file (link to nn)
+	nnusage		Show usage statistics
+	nnview		Reads mail folders (link to nn)
+
+
+LIB_DIRECTORY
+
+	The directory where nn's auxiliary programs and files will
+	be installed unless another directory is specified by one of
+	the following definitions.
+
+
+MASTER_DIRECTORY	(optional, default = LIB_DIRECTORY)
+
+	The directory containing the nnmaster daemon programs.  It
+	should not be shared in a networked environment!
+
+	back_act
+		Program to make daily copies of the active file to
+		allow nngoback to work.
+
+	nnmaster
+		The program building and maintaining nn's database.
+
+	nnspew	Program to build a tertiary subject database for
+		nngrab.
+
+	MPID	Exclusive lock file created by the currently running
+		nnmaster daemon process.  Accessed by nnadmin to
+		get the daemon's process id.
+
+	GATE	Message file created by nnadmin and deleted by nnmaster.
+
+
+CLIENT_DIRECTORY	(optional, default = LIB_DIRECTORY)
+
+	Contains the auxiliary programs and files required by the nn
+	program:
+
+	aux	The shell script used in connection with replies etc.
+		It knows about common editors like vi and gnu emacs to
+		have them position the cursor appropriately.  To add
+		support for your own favorite editor, you should edit
+		the file aux.sh, not the compiled `aux' script!
+
+	upgrade_rc
+		Script used by nn to convert release 6.3 rc files to .newsrc
+		format when first invoked after upgrade to 6.4 or later.
+
+
+HELP_DIRECTORY		(optional, default = CLIENT_DIRECTORY/help)
+
+	The directory where the help files and online manual are
+	stored.  This directory is an obvious candidate for sharing in
+	a network.
+
+
+CACHE_DIRECTORY		(optional, default = each user's .nn directory)
+
+	Only used with NNTP!! Directory to be used as a common storage
+	for temporary cache files when nn is used with NNTP.  Using a
+	common directory for cache files allows you to clean these out
+	on reboot with a single "rm" command in the rc file:
+	 	(cd CACHE_DIRECTORY; rm -f *)
+	But of course this requires that you use a separate directory
+	for the cache!
+
+
+TMP_DIRECTORY		(optional, default = /usr/tmp)
+
+	The directory to be used as temporary storage for files used
+	when editing responses etc.
+
+
+LOG_FILE	(optional, default = LIB_DIRECTORY/Log)
+
+	The log file used by nnmaster and nn to store reports, error
+	messages, usage statistics, etc.
+
+
+NEWS_DIRECTORY		(optional, default = /usr/spool/news)
+
+	The directory containing the news spool directories and files.
+	It is not required when a remote NNTP server is used.
+
+
+NEWS_LIB_DIRECTORY	(optional, default = /usr/lib/news)
+
+	The directory containing the news system's active file and
+	other related files.
+
+
+	      STEP 3.5: WHERE DO YOU WANT THE DATABASE?
+	      -----------------------------------------
+
+The following definitions in config.h are used to control where the
+database maintained by nnmaster is stored.  The database consists of a
+couple of files containing global information for all existing groups,
+and a pair of files for each non-empty group.  The database requires
+some disk space to hold the necessary information.  On average about
+100 bytes per article in the system, or about 5% of the space
+allocated to the news articles.
+
+The database is intended to be shared together with the news spool
+directory in a networked environment provided that NETWORK_DATABASE is
+defined in config.h.
+
+If DB_DIRECTORY is not defined, the global database files will be
+located in a directory named NEWS_DIRECTORY/.nn, and the per-group
+files will be located in each individual news group's directory (named
+.nnd and .nnx).  Using this strategy will normally require that
+nnmaster is owned "news" (OWNER in config.h).
+
+The location of the database can be changed via the following
+definitions in config.h:
+
+DB_DIRECTORY 		(optional, default = see above)
+	The directory containing the global database information files.
+	If you share /usr/spool/news via NFS or RFS, you can set DB to
+	something like /usr/spool/news/.nn to share it automatically
+	with /usr/spool/news.
+
+DB_DATA_DIRECTORY	(optional, default = DB_DIRECTORY/DATA)
+	When DB_DIRECTORY is defined, the per-group files will no
+	longer be stored in the group directories, but in a single
+	common directory specified by DB_DATA_DIRECTORY.  The files in
+	this directory will be named either by group number or by
+	group name (if DB_LONG_NAMES is also defined).
+
+
+The files config.h and NNTP describes how to share the database
+between several machines (also when you don't use NNTP).
+
+
+				STEP 4
+
+			 COMPILE THE SOFTWARE
+			 --------------------
+
+To compile the software, you just have to run one of the following
+make commands.
+
+If you are making a complete package with both master and client, do
+
+	$ make all
+
+If you want to share a database which resides on another host (through
+NFS/RFS/rdist), you don't need a master on the local system, so you
+can do the following instead:
+
+	$ make client
+
+
+				STEP 5
+
+		       INSTALLING THE SOFTWARE
+		       -----------------------
+
+Installation of the nn software is handled entirely via a script
+"./inst" created during the compilation.  The components of nn are
+split into five parts, which can be installed separately or in various
+combinations depending on whether you run a stand-alone system or
+networked systems sharing the database and other parts of the nn
+package.  The five components are:
+
+1) Master files and programs (machine dependent)
+   Install the MASTER_DIRECTORY programs.
+
+2) User files and programs (machine dependent, shareable)
+   Install the BIN_DIRECTORY programs.
+
+3) Auxiliary programs (configuration dependent, shareable)
+   Install the CLIENT_DIRECTORY files and programs.
+
+4) Documentation (shareable)
+   Install the MAN pages in the proper directories.
+
+5) Help files (shareable)
+   Install the HELP_DIRECTORY files (except online manual).
+
+6) Online manual (shareable with 5)
+   Format and install the online manual in HELP_DIRECTORY.
+
+
+Unless you have defined yourself as the owner of the nn package and
+have write permission on all the necessary directories, you will need
+to be super-user to install nn, so start with
+
+	$ su
+
+Now run the installation script:
+
+	# ./inst
+
+The `inst' script will list a menu with the following choices:
+
+(1)-(6)	Install individual parts of the package.
+
+(s)	Install a complete server + client package (1-6).
+
+(c)	Install a client which accesses all its support files and
+	the database via a network (2).
+
+(h)	Install a client with local auxiliary files, but shared
+	documentation and help files (2-3).
+
+(n)	Install a client accessing only the database via a network (2-6).
+
+(m)	Install only the nnmaster (1).
+
+(c)	Install only the client programs (2).
+
+(u)	Update already installed parts of the package.  This will
+	check for the existence of the old programs, and only update
+	programs and files already installed.  You will typically use
+	this after applying patches.
+
+You can also run the `inst' script with the choices as arguments, e.g.
+
+	./inst m c
+
+
+NOTICE: Since nnmaster runs setuid OWNER, all users can potentially
+	kill the running master, initialize the database etc. if they
+	have access to execute the master.  So either restrict the
+	permissions to execute nnmaster or the access to the directory
+	containing it.  The default installation puts modes -rwsr-s---
+	on nnmaster and leaves the directory "open" which may not be
+	adequate for you.
+
+
+				STEP 6
+
+		       INITIALIZE THE DATABASE
+		       -----------------------
+
+If you have installed the nnmaster on the current system, you now have
+to initialize the database:
+
+	$ su		 -- also as superuser
+	# ./inst INIT
+
+If something goes wrong in this step, e.g. problems with the active
+file, you must redo the initialization after fixing the other
+problems.
+
+When the INIT operation completes, a database with empty entries for
+all the currently existing groups will have been created.  If you want
+some special actions to be performed for specific groups as described
+in the nnmaster manual, you must now edit the GROUPS file created by
+nnmaster in the DB_DIRECTORY.  If you modify the GROUPS file, you must
+run the following command to register the changes to the GROUPS file.
+
+	$ MASTER_DIRECTORY/nnmaster -G
+
+When you are ready, you must start nnmaster to enter all the existing
+articles into the database.  If you use the following command,
+nnmaster will fork and return immediately; its background child will
+continue to update the database whenever new articles arrive:
+It will ignore articles which are more than 45 days old (-O).
+
+	$ MASTER_DIRECTORY/nnmaster -r -O45
+
+It may take quite a while before all existing articles have been
+entered into the database.  You can use nnadmin's (U)pdate and (S)tat
+commands to trace the progress and the (L)og command to see if it has
+finished (a C entry will occur).  You will see that many groups will
+be BLOCKED, but the number should decrease as nnmaster gets through
+more and more groups.
+
+You can also use the following command to do the initial collection of
+articles from a terminal and get a nice trace of the action:
+
+	$ MASTER_DIRECTORY/nnmaster -D -O45
+
+One or two numbers will be shown while a group is being collected.
+The first number is the number of the article currently being read.
+The (optional) second number will be the number of old (or bad)
+articles which nnmaster has ignored in the group so far.
+
+
+NOTICE: If the system file you have used does not specify how to
+	detatch a process from its controlling terminal, the nnmaster
+	may die when you log out.
+
+When nnmaster has finished the initial collection the articles, you
+can nnadmin's (V)alidate command to verify that the database build by
+nnmaster is consistent (restart nnadmin before verifying).
+
+
+				STEP 7
+
+			 UPDATE SYSTEM FILES
+			 -------------------
+
+You will have to edit some of the scripts and files on your system to
+get the database and other support files updates automatically, also
+following system shutdown, crashes, etc.
+
+
+	    STEP 7.1: START NNMASTER WHEN SYSTEM IS BOOTED
+	    ----------------------------------------------
+
+To have the database updated at all times, the nnmaster should be
+started when the system is booted.
+
+There will be a file named /etc/rc, a directory /etc/rc.d, or
+something similar on your system which contains commands that are
+executed when the system is booted.  The following commands should be
+added to the boot scripts:
+
+	rm -f MASTER_DIRECTORY/MPID
+	MASTER_DIRECTORY/nnmaster -l -r -C
+
+
+Alternatively, you can arrange for cron to run the master regularly.
+In this case, you should not use the -r and -C options.  Instead, you
+should let cron execute the command 'nnadmin Z' once a day to
+validate the database.  For example:
+
+	0,10,20,30,40,50 * * * * MASTER/nnmaster -LM
+	0 0 * * * BIN/nnadmin Z
+
+
+WARNING: If you share the database via NFS or RFS, nnmaster should run
+	 only on the system where the database actually resides!!
+	 And preferably it should run on the host where the news spool
+	 directory is located as well.  This will improve speed as well
+	 as reliability (NFS can suffer from time out problems).
+
+
+		STEP 7.2: SETUP EXPIRE ON THE DATABASE
+		--------------------------------------
+
+To run expire on the database, you simply have to execute the
+following command (with sufficient privileges):
+
+	BIN_DIRECTORY/nnadmin =EYW
+
+You should arrange for expire to be run on nn's database whenever you
+have run expire on the news directories.
+
+Supposing you run the expire from your crontab, you may simply add the
+above command to the crontab at an appropriate time when you are
+certain that news' expire is completed.
+
+If you run nnmaster from cron rather than in daemon mode, you can use
+the following command to run expire on the database.
+
+	nnmaster -F -k ""
+
+This form allows you to run expire on selected groups rather than on
+all groups as initiated by the above nnadmin command.  See the
+nnmaster manual for further details.
+
+
+	 STEP 7.3: SAVE A COPY OF THE ACTIVE FILE ONCE A DAY
+	 ---------------------------------------------------
+
+The `nngoback' program requires that the program `back_act' is
+executed once (and only once) every day to maintain suitable copies of
+the active files for the last 14 days.  In a network environment, it
+should execute on the same host as the nnmaster.
+
+Simply arrange for back_act to be invoked by cron once a day
+(preferably just before the batch of news for `today' arrives).  For
+example, assuming the news is received just before midnight (syntax
+and location of crontab entry may vary):
+
+In /usr/spool/cron/crontabs/news (System V):
+	00 23 * * * MASTER_DIRECTORY/back_act
+or in /usr/lib/crontab (BSD):
+	00 23 * * * su - news MASTER_DIRECTORY/back_act
+
+The default setup allows you to go 14 days back with nngoback, but if
+you don't keep news that long, there is no reason to keep that many
+copies of the active file either.  In that case, you can supply the
+maximum number of days as an argument to back_act.  Of course, you can
+also keep more than 14 copies of the active file to allow nngoback to
+go more than 14 days back by giving back_act an argument larger than 14.
+
+
+	  STEP 7.4:  PREPARE FOR NNSPEW TO BE RUN REGULARLY
+	  -------------------------------------------------
+
+The nngrab program will run faster if a dedicated subject database in
+addition to the normal database is available.  To maintain this
+additional database, the program nnspew must be executed regularly,
+e.g. from cron.  Every 3-6 hours should be sufficient to keep the
+database reasonably up-to-date, e.g.
+
+In /usr/spool/cron/crontabs/news (System V):
+	2 6,12,18 * * * MASTER_DIRECTORY/nnspew
+or in /usr/lib/crontab (BSD):
+	2 6,12,18 * * * su - news MASTER_DIRECTORY/nnspew
+
+
+				STEP 8
+
+		    INSTALL AND EDIT GLOBAL FILES
+		    -----------------------------
+
+Depending on your needs, you should create the following files on each
+host running nn (you may also just share the files if you like):
+
+CLIENT_DIRECTORY/init
+	The global init file for all users on the system.  Users will
+	be able to override the definitions in this file, but you can
+	probably make some sensible decisions which will prevent
+	novice users from getting into trouble, for example set the
+	default distribution to "local" etc.
+
+	You can also specify a global presentation sequence here.
+
+	You may use init.sample as a starting point, but don't use it
+	without careful examination.  Especially, the sequence part
+	is mainly an illustration of the possibilities.  If you are in
+	doubt, just delete the sequence part of the file (groups will
+	then be presented in pure alphabetical order).
+
+CLIENT_DIRECTORY/motd
+	Every time you change this file, it will be shown to the nn
+	users the next time they invoke nn.  This can be used to
+	inform the users about changes in the news environment or
+	local policies.  (motd = message of the day)
+
+
+NNTP_SERVER
+	Must contain the host name of the NNTP-server when NNTP is
+	used.  If you already run NNTP with your other news readers,
+	this file does not need to be modified.
+
+
+				STEP 9
+
+		       TEST THE BASIC FUNCTIONS
+		       ------------------------
+
+If any of the following tests fails or you see other peculiar
+behavior, you should consult the PROBLEMS file.  You may not be the
+only one to have seen the problems, and there might even be a solution.
+
+First you should check that nnmaster does collect the articles it is
+supposed to.  Here, nnadmin is a great help, since you can peek around
+in all the database files and see what nnmaster is doing.  nnadmin
+takes a snap-shot of the database when it starts up, but you can take
+a new snap-shot at any time using the (U)pdate command.
+
+Also look at the (L)og to see that there were no problems while
+collecting the articles.
+
+There are a few things you should check to ensure the proper
+functioning of nn.
+
+1) Backup your current .newsrc file if you have one.  (Don't save it
+   in .newsrc.bak or .newsrc.orig since nn may use these names).
+
+2) Run `nn'.  If you have upgraded from release 6.3, nn will convert
+   your release 6.3 .nn/rc file into a .newsrc file.
+
+3) Does nn find any news?  If not, does nn -x find anything?
+
+4) Can you send mail to yourself?  Try the sequence:
+	m (return) (return) testing (return)
+	edit the letter
+	s (return)
+
+   If not, you should check the REC_MAIL program.
+
+5) Can you post an article to the local test group?  Try:
+	:post (return)
+   	test (return)
+   	local (return)
+	edit the article
+	s (return)
+
+   If not, you should check the INEWS program.
+
+
+	     -------------------------------------------
+			 IF EVERYTHING WORKS
+		 YOU HAVE COMPLETED THE INSTALLATION
+	     -------------------------------------------
+
+
+			UPDATING THE SOFTWARE
+			---------------------
+
+Patches to this software will be distributes as context diff's which
+can be applied using Larry Wall's `patch' program.
+
+After applying the patches, you will need to redo the compilation and
+installation steps:
+
+	$ patch -p0 < PATCH_FILE	(or use nn's :patch command)
+	$ make all
+	$ su
+	# ./inst u
+
+To be able to install a new nnmaster, the currently running master (if
+any) will be stopped automatically, and it has to be started manually
+when the installation is complete (unless it is setup to be run by cron).
+
+Notice that unless it is explicitly required in the patch, there is no
+need to reinitialize the database after applying the patch.

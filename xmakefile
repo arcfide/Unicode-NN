@@ -1,0 +1,303 @@
+*
+* DO NOT CHANGE THIS MAKEFILE DIRECTLY
+*
+* THERE ARE NO CONFIGURATION PARAMETERS IN THIS FILE
+*
+
+#include "config.h"
+#undef global
+#undef SHELL
+
+#ifndef COMPILER_FLAGS
+#define COMPILER_FLAGS
+#endif
+
+#ifndef EXTRA_LIB
+#define EXTRA_LIB
+#endif
+
+#ifndef LOADER_FLAGS
+#define LOADER_FLAGS
+#endif
+
+#ifndef NNTP
+#undef NNTP_EXTRA_LIB
+#endif
+
+#ifndef NNTP_EXTRA_LIB
+#define NNTP_EXTRA_LIB
+#endif
+
+* Symmetry style parallel make
+
+#undef PARALLEL
+#ifdef PARALLEL_MAKE
+#define PARALLEL &
+#else
+#define PARALLEL
+#endif
+
+#ifdef ACCOUNTING
+#define ACCOUNT nnacct
+#else
+#ifdef AUTHORIZE
+#define ACCOUNT nnacct
+#else
+#define ACCOUNT
+#endif
+#endif
+------------------ MAKE WILL CUT HERE -------------
+*
+* Notice:  ymakefile is made from xmakefile by the Makefile.
+*
+
+CC =	 COMPILER
+CPP =	 PREPROC
+LDFLAGS = LDEBUG LOADER_FLAGS EXTRA_LIB
+CFLAGS = -Iconf COMPILER_FLAGS CDEBUG
+
+*
+* Resulting programs
+*
+
+BIN_PROG =	nn nnusage nngrab nnstats ACCOUNT
+BIN_LINK =	nncheck nnadmin nntidy nngoback nngrep nnpost nnbatch nnview
+LIB_PROG =	aux upgrade_rc
+#ifdef NOV
+MASTER_PROG =	back_act nnspew
+NN.1 = nn.1.nov
+#else
+MASTER_PROG =	nnmaster back_act nnspew
+NN.1 = nn.1.nnmaster
+#endif
+
+*
+* Compilation
+*
+
+SHELL = /bin/sh
+
+MASTER = master.o collect.o expire.o proto.o hostname.o \
+	global.o options.o active.o db.o nntp.o \
+	pack_date.o pack_name.o pack_subject.o news.o digest.o
+
+NN = 	nn.o admin.o proto.o global.o options.o db.o nntp.o \
+	init.o variable.o term.o keymap.o macro.o regexp.o \
+	menu.o more.o newsrc.o group.o folder.o dir.o aux.o \
+	sort.o articles.o sequence.o kill.o active.o fullname.o \
+	answer.o reroute.o hostname.o save.o unshar.o decode.o execute.o \
+	pack_date.o pack_name.o pack_subject.o news.o digest.o match.o \
+	chset.o printconf.o
+#ifdef NOV
+NOVOBJ = awksplit.o hash.o hdbm.o libnov.o split.o
+#else
+NOVOBJ =
+#endif
+
+ACCT = account.o global.o options.o proto.o hostname.o 
+
+
+all:	$(BIN_PROG) $(LIB_PROG) $(MASTER_PROG) inst
+
+client: $(BIN_PROG) $(LIB_PROG) inst
+
+master: $(MASTER_PROG) inst
+
+nn:	PARALLEL $(NN) $(NOVOBJ)
+	@echo linking nn
+	@$(CC) -o nn $(CFLAGS) $(NN) $(NOVOBJ) $(LDFLAGS) TERMLIB NNTP_EXTRA_LIB
+
+nnmaster: PARALLEL $(MASTER)
+	@echo linking nnmaster
+	@$(CC) -o nnmaster $(CFLAGS) $(MASTER) $(LDFLAGS) NNTP_EXTRA_LIB
+
+nnstats: nnstats.sh prefix
+	cat prefix nnstats.sh > nnstats ; chmod +x nnstats
+
+nnusage: nnusage.sh prefix
+	cat prefix nnusage.sh > nnusage ; chmod +x nnusage
+
+nngrab:	nngrab.sh prefix
+	cat prefix nngrab.sh > nngrab ; chmod +x nngrab
+
+aux:	 aux.sh prefix
+	cat prefix aux.sh > aux ; chmod +x aux
+
+upgrade_rc: upgrade_rc.sh prefix
+	cat prefix upgrade_rc.sh > upgrade_rc ; chmod +x upgrade_rc
+
+nnacct: PARALLEL $(ACCT)
+	@echo linking nnacct
+	@$(CC) -o nnacct $(CFLAGS) $(ACCT) $(LDFLAGS)
+
+back_act: back_act.sh prefix
+	cat prefix back_act.sh > back_act ; chmod +x back_act
+
+nnspew:	nnspew.sh prefix
+	cat prefix nnspew.sh > nnspew ; chmod +x nnspew
+
+prefix:	config.h mkprefix
+	./mkprefix prefix < /dev/null > prefix
+
+mkprefix: PARALLEL prefix.o global.o
+	$(CC) -o mkprefix $(CFLAGS) prefix.o global.o $(LDFLAGS)
+
+*
+* Configuration counter updating
+*
+
+update.h:	config.h patchlevel.h Makefile
+	@sh -c "[ -f update.h ] || (echo 0 > update.h)"
+	@sh -c "expr `cat update.h` + 1 > update1.h && mv update1.h update.h"
+	@echo configuration number updated to `cat update.h`
+
+*
+* Installation
+*
+
+cvt-help:	PARALLEL config.h cvt-help.c
+	$(CC) -o cvt-help cvt-help.c $(LDFLAGS)
+
+usercheck:	PARALLEL config.h usercheck.c
+	$(CC) -o usercheck usercheck.c $(LDFLAGS)
+
+inst: config.h xmakefile inst.sh cvt-help usercheck mkprefix man/nn.1
+	@echo building install script: ./inst
+	@./mkprefix full < /dev/null > inst
+	@echo BIN_PROG='"'$(BIN_PROG)'"' >> inst
+	@echo BIN_LINK='"'$(BIN_LINK)'"' >> inst
+	@echo LIB_PROG='"'$(LIB_PROG)'"' >> inst
+	@echo MASTER_PROG='"'$(MASTER_PROG)'"' >> inst
+	@cat inst.sh >> inst
+	@chmod 755 inst
+
+* create the proper man page
+
+man/nn.1:	man/nn.1.nov man/nn.1.nnmaster
+	cp -p man/$(NN.1) man/nn.1
+
+*
+* Clean -- remove compiled programs
+*
+
+clean:
+	rm -f $(BIN_PROG) $(LIB_PROG) $(MASTER_PROG) cvt-help usercheck
+	rm -f prefix mkprefix inst
+	rm -f man/nn.1
+
+*
+* dependencies
+*
+
+account.o:	account.c account.h config.h global.h execute.h options.h \
+		proto.h
+active.o:	active.c active.h config.h data.h global.h db.h master.h \
+		newsrc.h
+admin.o:	admin.c admin.h config.h data.h global.h db.h execute.h \
+		group.h keymap.h nn.h proto.h nn_term.h
+answer.o:	answer.c answer.h config.h data.h global.h aux.h db.h \
+		fullname.h group.h hostname.h init.h keymap.h kill.h \
+		match.h news.h nn.h nntp.h options.h printconf.h regexp.h \
+		reroute.h nn_term.h variable.h
+articles.o:	articles.c articles.h config.h data.h global.h db.h keymap.h \
+		kill.h match.h news.h newsrc.h regexp.h sort.h nn_term.h
+aux.o:		aux.c aux.h config.h data.h global.h chset.h execute.h \
+		keymap.h news.h nn.h nntp.h reroute.h nn_term.h
+chset.o:	chset.c chset.h config.h
+collect.o:	collect.c collect.h config.h global.h db.h news.h digest.h \
+		master.h news.h nntp.h pack_date.h pack_name.h pack_subject.h
+db.o:		db.c db.h config.h data.h global.h answer.h articles.h \
+		keymap.h libnov.h nntp.h nn_term.h pack_date.h pack_name.h \
+		pack_subject.h hash.h newsoverview.h
+decode.o:	decode.c decode.h config.h data.h global.h keymap.h save.h \
+		nn_term.h
+digest.o:	digest.c digest.h config.h data.h global.h debug.h keymap.h \
+		news.h pack_name.h nn_term.h
+dir.o:		dir.c dir.h config.h data.h global.h articles.h keymap.h \
+		nn_term.h
+execute.o:	execute.c execute.h config.h data.h global.h folder.h \
+		keymap.h nn_term.h
+expire.o:	expire.c expire.h config.h global.h db.h keymap.h master.h \
+		nntp.h nn_term.h
+folder.o:	folder.c folder.h config.h data.h global.h articles.h \
+		db.h digest.h dir.h keymap.h match.h menu.h news.h \
+		pack_date.h pack_name.h pack_subject.h regexp.h save.h \
+		sort.h nn_term.h
+fullname.o:	fullname.c fullname.h config.h data.h global.h
+global.o:	global.c data.h global.h config.h execute.h keymap.h nn.h \
+		patchlevel.h nn_term.h update.h
+group.o:	group.c group.h config.h data.h global.h articles.h db.h \
+		folder.h keymap.h macro.h match.h menu.h newsrc.h nn.h \
+		nntp.h regexp.h sort.h nn_term.h variable.h
+hostname.o:	hostname.c hostname.h config.h
+init.o:		init.c init.h config.h data.h global.h articles.h admin.h \
+		answer.h db.h execute.h folder.h group.h hostname.h \
+		keymap.h kill.h macro.h menu.h newsrc.h nn.h printconf.h \
+		save.h sequence.h sort.h nn_term.h variable.h
+keymap.o:	keymap.c keymap.h config.h data.h global.h init.h nn_term.h
+kill.o:		kill.c kill.h config.h data.h global.h db.h keymap.h \
+		match.h menu.h regexp.h nn_term.h
+macro.o:	macro.c macro.h config.h data.h global.h db.h init.h \
+		keymap.h menu.h nn_term.h variable.h
+master.o:	master.c master.h config.h global.h active.h collect.h db.h \
+		digest.h execute.h expire.h news.h nntp.h options.h proto.h
+match.o:	match.c match.h config.h data.h global.h regexp.h
+menu.o:		menu.c menu.h config.h data.h global.h articles.h \
+		answer.h db.h execute.h folder.h group.h init.h keymap.h \
+		kill.h macro.h match.h more.h newsrc.h regexp.h save.h \
+		sort.h nn_term.h 
+more.o:		more.c more.h config.h data.h global.h articles.h answer.h \
+		db.h execute.h folder.h group.h init.h keymap.h kill.h \
+		macro.h match.h menu.h news.h regexp.h save.h nn_term.h
+news.o:		news.c news.h config.h data.h global.h digest.h more.h nntp.h
+newsrc.o:	newsrc.c newsrc.h config.h data.h global.h articles.h \
+		active.h db.h keymap.h nn.h options.h regexp.h nn_term.h
+nn.o:		nn.c nn.h config.h data.h global.h admin.h answer.h \
+		articles.h db.h execute.h folder.h group.h init.h keymap.h \
+		kill.h libnov.h macro.h match.h menu.h newsrc.h nntp.h \
+		options.h proto.h regexp.h sequence.h nn_term.h
+nntp.o:		nntp.c nntp.h config.h data.h global.h fullname.h hash.h \
+		hostname.h keymap.h libnov.h nn_term.h patchlevel.h \
+		newsoverview.h
+options.o:	options.c options.h config.h data.h global.h nn.h variable.h
+pack_date.o:	pack_date.c pack_date.h config.h data.h global.h
+pack_name.o:	pack_name.c pack_name.h config.h data.h global.h
+pack_subject.o:	pack_subject.c pack_subject.h config.h data.h global.h
+prefix.o:	prefix.c config.h data.h global.h execute.h
+printconf.o:	printconf.c printconf.h config.h data.h global.h
+proto.o:	proto.c proto.h config.h data.h global.h hostname.h
+regexp.o:	regexp.c regexp.h config.h data.h global.h keymap.h nn_term.h
+reroute.o:	reroute.c reroute.h config.h data.h global.h
+save.o:		save.c save.h config.h data.h global.h db.h decode.h \
+		digest.h folder.h keymap.h more.h news.h nn_term.h unshar.h
+sequence.o:	sequence.c sequence.h config.h data.h global.h db.h \
+		debug.h keymap.h macro.h nn.h nn_term.h variable.h
+sort.o:		sort.c sort.h config.h data.h global.h  articles.h
+term.o:		term.c nn_term.h config.h data.h global.h execute.h \
+		folder.h keymap.h macro.h nn.h regexp.h
+unshar.o:	unshar.c unshar.h config.h data.h global.h keymap.h nn_term.h
+variable.o:	variable.c variable.h config.h data.h global.h chset.h \
+		folder.h init.h keymap.h regexp.h sort.h nn_term.h
+
+awksplit.o:	awksplit.c awksplit.h config.h split.h
+hash.o:		hash.c hash.h config.h hdbm.h
+hdbm.o:		hdbm.c hdbm.h config.h hdbmint.h 
+libnov.o:	libnov.c libnov.h config.h data.h global.h awksplit.h \
+		digest.h hash.h newsoverview.h news.h nntp.h split.h
+split.o:	split.c split.h config.h
+
+* link debugging version
+
+nn1:	$(NN)
+	$(CC) -o nn1 -Mnn1 $(CFLAGS) $(NN) $(LDFLAGS) TERMLIB NNTP_EXTRA_LIB
+
+nnmaster1: $(MASTER)
+	$(CC) -o nnmaster1 -Mnnmaster1 $(CFLAGS) $(MASTER) $(LDFLAGS) NNTP_EXTRA_LIB
+
+lint:
+	echo LINTING NN
+	lint -Iconf -u $(NN:.o=.c)
+*	echo LINTING MASTER
+*	lint -Iconf -u $(MASTER:.o=.c)
+	echo LINTING NOVOBJ
+	lint -Iconf -u $(NOVOBJ:.o=.c)

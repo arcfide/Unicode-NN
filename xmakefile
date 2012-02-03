@@ -77,16 +77,16 @@ NN.1 = nn.1.nnmaster
 
 SHELL = /bin/sh
 
-MASTER = master.o collect.o expire.o proto.o hostname.o \
-	global.o options.o active.o db.o nntp.o \
+MASTER = master.o collect.o expire.o proto.o hostname.o \\
+	global.o options.o active.o db.o nntp.o \\
 	pack_date.o pack_name.o pack_subject.o news.o digest.o
 
-NN = 	nn.o admin.o proto.o global.o options.o db.o nntp.o \
-	init.o variable.o term.o keymap.o macro.o regexp.o \
-	menu.o more.o newsrc.o group.o folder.o dir.o aux.o \
-	sort.o articles.o sequence.o kill.o active.o fullname.o \
-	answer.o reroute.o hostname.o save.o unshar.o decode.o execute.o \
-	pack_date.o pack_name.o pack_subject.o news.o digest.o match.o \
+NN = 	nn.o admin.o proto.o global.o options.o db.o nntp.o \\
+	init.o variable.o term.o keymap.o macro.o regexp.o \\
+	menu.o more.o newsrc.o group.o folder.o dir.o aux.o \\
+	sort.o articles.o sequence.o kill.o active.o fullname.o \\
+	answer.o reroute.o hostname.o save.o unshar.o decode.o execute.o \\
+	pack_date.o pack_name.o pack_subject.o news.o digest.o match.o \\
 	chset.o printconf.o
 #ifdef NOV
 NOVOBJ = awksplit.o hash.o hdbm.o libnov.o split.o
@@ -189,75 +189,75 @@ clean:
 * dependencies
 *
 
-account.o:	account.c account.h config.h global.h execute.h options.h \
+account.o:	account.c account.h config.h global.h execute.h options.h \\
 		proto.h
-active.o:	active.c active.h config.h data.h global.h db.h master.h \
+active.o:	active.c active.h config.h data.h global.h db.h master.h \\
 		newsrc.h
-admin.o:	admin.c admin.h config.h data.h global.h db.h execute.h \
+admin.o:	admin.c admin.h config.h data.h global.h db.h execute.h \\
 		group.h keymap.h nn.h proto.h nn_term.h
-answer.o:	answer.c answer.h config.h data.h global.h aux.h db.h \
-		fullname.h group.h hostname.h init.h keymap.h kill.h \
-		match.h news.h nn.h nntp.h options.h printconf.h regexp.h \
+answer.o:	answer.c answer.h config.h data.h global.h aux.h db.h \\
+		fullname.h group.h hostname.h init.h keymap.h kill.h \\
+		match.h news.h nn.h nntp.h options.h printconf.h regexp.h \\
 		reroute.h nn_term.h variable.h
-articles.o:	articles.c articles.h config.h data.h global.h db.h keymap.h \
+articles.o:	articles.c articles.h config.h data.h global.h db.h keymap.h \\
 		kill.h match.h news.h newsrc.h regexp.h sort.h nn_term.h
-aux.o:		aux.c aux.h config.h data.h global.h chset.h execute.h \
+aux.o:		aux.c aux.h config.h data.h global.h chset.h execute.h \\
 		keymap.h news.h nn.h nntp.h reroute.h nn_term.h
 chset.o:	chset.c chset.h config.h
-collect.o:	collect.c collect.h config.h global.h db.h news.h digest.h \
+collect.o:	collect.c collect.h config.h global.h db.h news.h digest.h \\
 		master.h news.h nntp.h pack_date.h pack_name.h pack_subject.h
-db.o:		db.c db.h config.h data.h global.h answer.h articles.h \
-		keymap.h libnov.h nntp.h nn_term.h pack_date.h pack_name.h \
+db.o:		db.c db.h config.h data.h global.h answer.h articles.h \\
+		keymap.h libnov.h nntp.h nn_term.h pack_date.h pack_name.h \\
 		pack_subject.h hash.h newsoverview.h
-decode.o:	decode.c decode.h config.h data.h global.h keymap.h save.h \
+decode.o:	decode.c decode.h config.h data.h global.h keymap.h save.h \\
 		nn_term.h
-digest.o:	digest.c digest.h config.h data.h global.h debug.h keymap.h \
+digest.o:	digest.c digest.h config.h data.h global.h debug.h keymap.h \\
 		news.h pack_name.h nn_term.h
-dir.o:		dir.c dir.h config.h data.h global.h articles.h keymap.h \
+dir.o:		dir.c dir.h config.h data.h global.h articles.h keymap.h \\
 		nn_term.h
-execute.o:	execute.c execute.h config.h data.h global.h folder.h \
+execute.o:	execute.c execute.h config.h data.h global.h folder.h \\
 		keymap.h nn_term.h
-expire.o:	expire.c expire.h config.h global.h db.h keymap.h master.h \
+expire.o:	expire.c expire.h config.h global.h db.h keymap.h master.h \\
 		nntp.h nn_term.h
-folder.o:	folder.c folder.h config.h data.h global.h articles.h \
-		db.h digest.h dir.h keymap.h match.h menu.h news.h \
-		pack_date.h pack_name.h pack_subject.h regexp.h save.h \
+folder.o:	folder.c folder.h config.h data.h global.h articles.h \\
+		db.h digest.h dir.h keymap.h match.h menu.h news.h \\
+		pack_date.h pack_name.h pack_subject.h regexp.h save.h \\
 		sort.h nn_term.h
 fullname.o:	fullname.c fullname.h config.h data.h global.h
-global.o:	global.c data.h global.h config.h execute.h keymap.h nn.h \
+global.o:	global.c data.h global.h config.h execute.h keymap.h nn.h \\
 		patchlevel.h nn_term.h update.h
-group.o:	group.c group.h config.h data.h global.h articles.h db.h \
-		folder.h keymap.h macro.h match.h menu.h newsrc.h nn.h \
+group.o:	group.c group.h config.h data.h global.h articles.h db.h \\
+		folder.h keymap.h macro.h match.h menu.h newsrc.h nn.h \\
 		nntp.h regexp.h sort.h nn_term.h variable.h
 hostname.o:	hostname.c hostname.h config.h
-init.o:		init.c init.h config.h data.h global.h articles.h admin.h \
-		answer.h db.h execute.h folder.h group.h hostname.h \
-		keymap.h kill.h macro.h menu.h newsrc.h nn.h printconf.h \
+init.o:		init.c init.h config.h data.h global.h articles.h admin.h \\
+		answer.h db.h execute.h folder.h group.h hostname.h \\
+		keymap.h kill.h macro.h menu.h newsrc.h nn.h printconf.h \\
 		save.h sequence.h sort.h nn_term.h variable.h
 keymap.o:	keymap.c keymap.h config.h data.h global.h init.h nn_term.h
-kill.o:		kill.c kill.h config.h data.h global.h db.h keymap.h \
+kill.o:		kill.c kill.h config.h data.h global.h db.h keymap.h \\
 		match.h menu.h regexp.h nn_term.h
-macro.o:	macro.c macro.h config.h data.h global.h db.h init.h \
+macro.o:	macro.c macro.h config.h data.h global.h db.h init.h \\
 		keymap.h menu.h nn_term.h variable.h
-master.o:	master.c master.h config.h global.h active.h collect.h db.h \
+master.o:	master.c master.h config.h global.h active.h collect.h db.h \\
 		digest.h execute.h expire.h news.h nntp.h options.h proto.h
 match.o:	match.c match.h config.h data.h global.h regexp.h
-menu.o:		menu.c menu.h config.h data.h global.h articles.h \
-		answer.h db.h execute.h folder.h group.h init.h keymap.h \
-		kill.h macro.h match.h more.h newsrc.h regexp.h save.h \
+menu.o:		menu.c menu.h config.h data.h global.h articles.h \\
+		answer.h db.h execute.h folder.h group.h init.h keymap.h \\
+		kill.h macro.h match.h more.h newsrc.h regexp.h save.h \\
 		sort.h nn_term.h 
-more.o:		more.c more.h config.h data.h global.h articles.h answer.h \
-		db.h execute.h folder.h group.h init.h keymap.h kill.h \
+more.o:		more.c more.h config.h data.h global.h articles.h answer.h \\
+		db.h execute.h folder.h group.h init.h keymap.h kill.h \\
 		macro.h match.h menu.h news.h regexp.h save.h nn_term.h
 news.o:		news.c news.h config.h data.h global.h digest.h more.h nntp.h
-newsrc.o:	newsrc.c newsrc.h config.h data.h global.h articles.h \
+newsrc.o:	newsrc.c newsrc.h config.h data.h global.h articles.h \\
 		active.h db.h keymap.h nn.h options.h regexp.h nn_term.h
-nn.o:		nn.c nn.h config.h data.h global.h admin.h answer.h \
-		articles.h db.h execute.h folder.h group.h init.h keymap.h \
-		kill.h libnov.h macro.h match.h menu.h newsrc.h nntp.h \
+nn.o:		nn.c nn.h config.h data.h global.h admin.h answer.h \\
+		articles.h db.h execute.h folder.h group.h init.h keymap.h \\
+		kill.h libnov.h macro.h match.h menu.h newsrc.h nntp.h \\
 		options.h proto.h regexp.h sequence.h nn_term.h
-nntp.o:		nntp.c nntp.h config.h data.h global.h fullname.h hash.h \
-		hostname.h keymap.h libnov.h nn_term.h patchlevel.h \
+nntp.o:		nntp.c nntp.h config.h data.h global.h fullname.h hash.h \\
+		hostname.h keymap.h libnov.h nn_term.h patchlevel.h \\
 		newsoverview.h
 options.o:	options.c options.h config.h data.h global.h nn.h variable.h
 pack_date.o:	pack_date.c pack_date.h config.h data.h global.h
@@ -268,21 +268,21 @@ printconf.o:	printconf.c printconf.h config.h data.h global.h
 proto.o:	proto.c proto.h config.h data.h global.h hostname.h
 regexp.o:	regexp.c regexp.h config.h data.h global.h keymap.h nn_term.h
 reroute.o:	reroute.c reroute.h config.h data.h global.h
-save.o:		save.c save.h config.h data.h global.h db.h decode.h \
+save.o:		save.c save.h config.h data.h global.h db.h decode.h \\
 		digest.h folder.h keymap.h more.h news.h nn_term.h unshar.h
-sequence.o:	sequence.c sequence.h config.h data.h global.h db.h \
+sequence.o:	sequence.c sequence.h config.h data.h global.h db.h \\
 		debug.h keymap.h macro.h nn.h nn_term.h variable.h
 sort.o:		sort.c sort.h config.h data.h global.h  articles.h
-term.o:		term.c nn_term.h config.h data.h global.h execute.h \
+term.o:		term.c nn_term.h config.h data.h global.h execute.h \\
 		folder.h keymap.h macro.h nn.h regexp.h
 unshar.o:	unshar.c unshar.h config.h data.h global.h keymap.h nn_term.h
-variable.o:	variable.c variable.h config.h data.h global.h chset.h \
+variable.o:	variable.c variable.h config.h data.h global.h chset.h \\
 		folder.h init.h keymap.h regexp.h sort.h nn_term.h
 
 awksplit.o:	awksplit.c awksplit.h config.h split.h
 hash.o:		hash.c hash.h config.h hdbm.h
 hdbm.o:		hdbm.c hdbm.h config.h hdbmint.h 
-libnov.o:	libnov.c libnov.h config.h data.h global.h awksplit.h \
+libnov.o:	libnov.c libnov.h config.h data.h global.h awksplit.h \\
 		digest.h hash.h newsoverview.h news.h nntp.h split.h
 split.o:	split.c split.h config.h
 

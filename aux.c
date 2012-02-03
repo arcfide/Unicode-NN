@@ -507,7 +507,7 @@ aux_sh(article_header * ah, char *script, char *prog, char *action, char *record
 		prompt_line = Lines - 1;
 		prompt("To: ");
 		unset_raw();
-		if (getline(&cc[0], sizeof(cc)) == 0)
+		if (nn_getline(&cc[0], sizeof(cc)) == 0)
 		    cc[0] = CR;
 		nn_raw();
 		if (cc[0] != CR)

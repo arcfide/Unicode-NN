@@ -258,7 +258,7 @@ int             nn_truncate(char *, off_t);
 char           *strsave(char *);
 char           *str3save(char *, char *, char *);
 char           *fgetstr(FILE *);
-int             getline(char *, int);
+int             nn_getline(char *, int);
 extern char    *tmp_directory;
 extern char    *nntp_cache_dir;
 #endif				/* _NN_GLOBAL_H */

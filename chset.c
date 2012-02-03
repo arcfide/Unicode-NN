@@ -22,6 +22,7 @@ static struct chset chsets[] = {
     "iso-8859-8", 8,
     "iso-8859-9", 8,
     "iso-8859-15", 8,
+    "utf-8", 8,
     "unknown", 0,
     NULL, 0,
 };

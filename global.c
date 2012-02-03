@@ -1307,12 +1307,12 @@ fgetstr(FILE * f)
 }
 
 /*
- *	getline - gets a line from stdin
+ *	nn_getline - gets a line from stdin
  *			returns the length of the line
  */
 
 int
-getline(char *line, int max)
+nn_getline(char *line, int max)
 {
     if (fgets(line, max, stdin) == NULL)
 	return 0;

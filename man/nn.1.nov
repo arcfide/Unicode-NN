@@ -3286,6 +3286,12 @@ since it is looked at before the init file is read.  It must be
 set to a full pathname.  Usually set when using multiple servers;
 see \fInewsrc\fP above and \fInntp-server\fP below.
 .TP
+\fBnntp-auth\fP    (boolean, default false)
+When set, NN will always try to authenticate regardless of the 
+information sent by the server on connection. When not set, NN 
+with authenticate if necessary or if posting is not allowed, 
+in case authenticating will enable posting.
+.TP
 \fBnntp-cache-dir\fP \fIdirectory\fP	(string, default "~/.nn")
 When NNTP is used, \fInn\fP needs to store articles temporarily on
 disk.  This variable specifies which directory \fInn\fP will use to

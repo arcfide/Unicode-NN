@@ -109,6 +109,7 @@ int             nntp_cache_size = NNTPCACHE;
 char           *nntp_cache_dir = NULL;
 char           *nntp_server = NNTP_SERVER;	/* name of nntp server */
 char           *nntp_user, *nntp_password;	/* so can set on command line */
+int		nntp_auth = 0;
 
 int             nntp_local_server = 0;
 int             nntp_debug = 0;
@@ -504,6 +505,16 @@ retrymode:
 	    /* if it doesn't understand MODE READER, we dont care.. :-) */
 	    break;
     }
+    
+    /* Sometimes an user may want to always authenticate regardless;
+     * in this case, they set the nntp-auth variable and we will 
+     * always try to authenticate at least once 
+     */
+    if (!triedauth && nntp_auth) {
+	nntp_doauth();
+	triedauth++;
+	goto retrymode;
+    }    
 
     if (!can_post && !triedauth) {
 

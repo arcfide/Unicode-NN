@@ -145,6 +145,7 @@ extern char    *nn_directory;
 extern char    *nntp_cache_dir, *nntp_server;
 extern char    *nntp_user, *nntp_password;
 extern int      nntp_cache_size, nntp_debug;
+extern int	nntp_auth;
 #endif
 
 extern          key_type	/* key strokes */
@@ -322,6 +323,7 @@ static struct variable_defs {
     "nn-directory", STR 2, (char **) &nn_directory,
 
 #ifdef NNTP
+    "nntp-auth", BOOL 0, (char **) &nntp_auth,
     "nntp-cache-dir", STR INIT 0, (char **) &nntp_cache_dir,
     "nntp-cache-size", INT INIT 0, (char **) &nntp_cache_size,
     "nntp-debug", BOOL 0, (char **) &nntp_debug,

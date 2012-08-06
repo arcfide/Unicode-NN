@@ -3306,6 +3306,12 @@ default and maximum values may be changed during configuration.
 When set, a trace of the nntp related traffic is displayed in the
 message line on the screen.
 .TP
+\fBnntp-password\fP    (string)
+This is the password that NN will use to authenticate to the server 
+if required by the server or forced with the \fInntp-auth\fP variable.
+Be careful of setting this in your \fIinit\fP file, as this could present 
+a security risk! See also the \fInntp-user\fP variable.
+.TP
 \fBnntp-server\fP \fIhostname\fP or \fIfilename\fP\fP (string)
 It only makes sense to set this variable on the command line,
 e.g. "nntp-server=news.some.domain",
@@ -3313,6 +3319,11 @@ since it is looked at before the init file,
 If you use multiple servers, you probably want to set the
 \fInn-directory\fP and \fInewsrc\fP variables on the command line to
 alternate names as well, since some of the data files are server dependent.
+.TP
+\fBnntp-user\fP    (string)
+If NN tries to authenticate, it will use the username given in this 
+variable as the username to authenticate with. See also \fInntp-password\fP,
+which you probably want to set as well.
 .TP
 \fBold\fP [\fImax-articles\fP]	(integer, default not set)
 When
